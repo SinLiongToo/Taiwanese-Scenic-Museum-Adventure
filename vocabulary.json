@@ -1,0 +1,1599 @@
+[
+    {
+        "zh": "山",
+        "tw": "soaⁿ",
+        "en": "Mountain",
+        "emoji": "⛰️",
+        "type": "land"
+    },
+    {
+        "zh": "溪",
+        "tw": "khe",
+        "en": "River/Creek",
+        "emoji": "🏞️",
+        "type": "water"
+    },
+    {
+        "zh": "河",
+        "tw": "hô",
+        "en": "River/Canal",
+        "emoji": "🛥️",
+        "type": "water"
+    },
+    {
+        "zh": "潭",
+        "tw": "thâm",
+        "en": "Deep Lake",
+        "emoji": "💧",
+        "type": "water"
+    },
+    {
+        "zh": "海",
+        "tw": "hái",
+        "en": "Sea/Ocean",
+        "emoji": "🌊",
+        "type": "water"
+    },
+    {
+        "zh": "島",
+        "tw": "tó",
+        "en": "Island",
+        "emoji": "🏝️",
+        "type": "land"
+    },
+    {
+        "zh": "樹仔",
+        "tw": "chhiū-á",
+        "en": "Tree",
+        "emoji": "🌲",
+        "type": "nature"
+    },
+    {
+        "zh": "溫泉",
+        "tw": "un-tsuân",
+        "en": "Hot Spring",
+        "emoji": "♨️",
+        "type": "water"
+    },
+    {
+        "zh": "龜",
+        "tw": "ku",
+        "en": "Turtle",
+        "emoji": "🐢",
+        "type": "nature"
+    },
+    {
+        "zh": "魚",
+        "tw": "hî",
+        "en": "Fish",
+        "emoji": "🐟",
+        "type": "nature"
+    },
+    {
+        "zh": "峽谷",
+        "tw": "ha̍p-kok",
+        "en": "Canyon",
+        "emoji": "🪨",
+        "type": "land"
+    },
+    {
+        "zh": "石頭",
+        "tw": "chio̍h-thâu",
+        "en": "Stone/Rock",
+        "emoji": "🗿",
+        "type": "nature"
+    },
+    {
+        "zh": "雪",
+        "tw": "seh",
+        "en": "Snow",
+        "emoji": "❄️",
+        "type": "nature"
+    },
+    {
+        "zh": "寶物",
+        "tw": "pó-bu̍t",
+        "en": "Treasure",
+        "emoji": "💎",
+        "type": "museum"
+    },
+    {
+        "zh": "恐龍",
+        "tw": "khióng-liông",
+        "en": "Dinosaur",
+        "emoji": "🦖",
+        "type": "museum"
+    },
+    {
+        "zh": "鯊魚",
+        "tw": "soa-hî",
+        "en": "Shark",
+        "emoji": "🦈",
+        "type": "water"
+    },
+    {
+        "zh": "博物館",
+        "tw": "phok-bu̍t-koán",
+        "en": "Museum",
+        "emoji": "🏛️",
+        "type": "museum"
+    },
+    {
+        "zh": "瀑布",
+        "tw": "pha̍k-poo",
+        "en": "Waterfall",
+        "emoji": "💦",
+        "type": "water"
+    },
+    {
+        "zh": "老街",
+        "tw": "lāu-ke",
+        "en": "Old Street",
+        "emoji": "🏮",
+        "type": "culture"
+    },
+    {
+        "zh": "古堡",
+        "tw": "kóo-pó",
+        "en": "Old Fort",
+        "emoji": "🏰",
+        "type": "culture"
+    },
+    {
+        "zh": "燈塔",
+        "tw": "teng-thah",
+        "en": "Lighthouse",
+        "emoji": "🗼",
+        "type": "culture"
+    },
+    {
+        "zh": "濕地",
+        "tw": "si̍p-tē",
+        "en": "Wetland",
+        "emoji": "🦀",
+        "type": "nature"
+    },
+    {
+        "zh": "夜市",
+        "tw": "iā-chhī",
+        "en": "Night Market",
+        "emoji": "🌙",
+        "type": "culture"
+    },
+    {
+        "zh": "廟",
+        "tw": "biō",
+        "en": "Temple",
+        "emoji": "⛩️",
+        "type": "culture"
+    },
+    {
+        "zh": "珊瑚",
+        "tw": "san-hôo",
+        "en": "Coral",
+        "emoji": "🪸",
+        "type": "water"
+    },
+    {
+        "zh": "藝術",
+        "tw": "gē-su̍t",
+        "en": "Art",
+        "emoji": "🎨",
+        "type": "museum"
+    },
+    {
+        "zh": "化石",
+        "tw": "hòa-seh",
+        "en": "Fossil",
+        "emoji": "🦣",
+        "type": "museum"
+    },
+    {
+        "zh": "石器",
+        "tw": "chio̍h-khì",
+        "en": "Stone Tool",
+        "emoji": "🪨",
+        "type": "museum"
+    },
+    {
+        "zh": "科學",
+        "tw": "kho-ha̍k",
+        "en": "Science",
+        "emoji": "🔬",
+        "type": "museum"
+    },
+    {
+        "zh": "香腸",
+        "tw": "hiong-tsiâng",
+        "en": "Sausage",
+        "emoji": "🌭",
+        "type": "culture"
+    },
+    {
+        "zh": "歷史",
+        "tw": "li̍k-sú",
+        "en": "History",
+        "emoji": "🚢",
+        "type": "museum"
+    },
+    {
+        "zh": "文學",
+        "tw": "bûn-ha̍k",
+        "en": "Literature",
+        "emoji": "📚",
+        "type": "museum"
+    },
+    {
+        "zh": "法律",
+        "tw": "huat-lu̍t",
+        "en": "Law",
+        "emoji": "⚖️",
+        "type": "culture"
+    },
+    {
+        "zh": "建築",
+        "tw": "kiàn-tio̍k",
+        "en": "Architecture",
+        "emoji": "🔺",
+        "type": "culture"
+    },
+    {
+        "zh": "噶瑪蘭",
+        "tw": "Kat-má-lân",
+        "en": "Kavalan",
+        "emoji": "🛶",
+        "type": "culture"
+    },
+    {
+        "zh": "史前",
+        "tw": "sú-tsîng",
+        "en": "Prehistoric",
+        "emoji": "🏺",
+        "type": "museum"
+    },
+    {
+        "zh": "工藝",
+        "tw": "kang-gī",
+        "en": "Craft/Technology",
+        "emoji": "🏗️",
+        "type": "museum"
+    },
+    {
+        "zh": "美術",
+        "tw": "bí-su̍t",
+        "en": "Fine Arts",
+        "emoji": "🎨",
+        "type": "museum"
+    },
+    {
+        "zh": "科技",
+        "tw": "kho-kī",
+        "en": "Technology",
+        "emoji": "⚙️",
+        "type": "museum"
+    },
+    {
+        "zh": "考古",
+        "tw": "khó-kóo",
+        "en": "Archaeology",
+        "emoji": "🦕",
+        "type": "museum"
+    },
+    {
+        "zh": "黃金",
+        "tw": "hông-kim",
+        "en": "Gold",
+        "emoji": "🪙",
+        "type": "culture"
+    },
+    {
+        "zh": "現代",
+        "tw": "hiān-tāi",
+        "en": "Modern",
+        "emoji": "🏙️",
+        "type": "culture"
+    },
+    {
+        "zh": "展覽",
+        "tw": "tián-lám",
+        "en": "Exhibition",
+        "emoji": "🖼️",
+        "type": "museum"
+    },
+    {
+        "zh": "陶瓷",
+        "tw": "tô-hûi",
+        "en": "Ceramics",
+        "emoji": "🏺",
+        "type": "museum"
+    },
+    {
+        "zh": "教育",
+        "tw": "kàu-io̍k",
+        "en": "Education",
+        "emoji": "🎓",
+        "type": "museum"
+    },
+    {
+        "zh": "當代",
+        "tw": "tòng-tāi",
+        "en": "Contemporary",
+        "emoji": "🏙️",
+        "type": "museum"
+    },
+    {
+        "zh": "郵政",
+        "tw": "iû-tsìng",
+        "en": "Postal Service",
+        "emoji": "📮",
+        "type": "culture"
+    },
+    {
+        "zh": "茶業",
+        "tw": "tê-gia̍p",
+        "en": "Tea Industry",
+        "emoji": "🍵",
+        "type": "nature"
+    },
+    {
+        "zh": "泰雅",
+        "tw": "Thài-ia",
+        "en": "Atayal",
+        "emoji": "🏹",
+        "type": "culture"
+    },
+    {
+        "zh": "書法",
+        "tw": "su-huat",
+        "en": "Calligraphy",
+        "emoji": "🖌️",
+        "type": "museum"
+    },
+    {
+        "zh": "木藝",
+        "tw": "bo̍k-gī",
+        "en": "Wood Art",
+        "emoji": "🪵",
+        "type": "museum"
+    },
+    {
+        "zh": "玻璃",
+        "tw": "pō-lê",
+        "en": "Glass",
+        "emoji": "🍺",
+        "type": "museum"
+    },
+    {
+        "zh": "影像",
+        "tw": "íng-siōng",
+        "en": "Image/Photo",
+        "emoji": "📷",
+        "type": "museum"
+    },
+    {
+        "zh": "客家",
+        "tw": "Kheh-ka",
+        "en": "Hakka",
+        "emoji": "🏮",
+        "type": "culture"
+    },
+    {
+        "zh": "木雕",
+        "tw": "bo̍k-tiau",
+        "en": "Wood Carving",
+        "emoji": "🪵",
+        "type": "museum"
+    },
+    {
+        "zh": "世界",
+        "tw": "sè-kài",
+        "en": "World",
+        "emoji": "🌐",
+        "type": "culture"
+    },
+    {
+        "zh": "布袋戲",
+        "tw": "poo-tē-hì",
+        "en": "Puppet Show",
+        "emoji": "🎭",
+        "type": "culture"
+    },
+    {
+        "zh": "南院",
+        "tw": "Lâm-īnn",
+        "en": "Southern Branch",
+        "emoji": "🏛️",
+        "type": "museum"
+    },
+    {
+        "zh": "菸葉",
+        "tw": "hun-hio̍h",
+        "en": "Tobacco Leaf",
+        "emoji": "🍂",
+        "type": "culture"
+    },
+    {
+        "zh": "傳統",
+        "tw": "thoân-thóng",
+        "en": "Traditional",
+        "emoji": "🏺",
+        "type": "culture"
+    },
+    {
+        "zh": "石雕",
+        "tw": "tsioh-tiau",
+        "en": "Stone Carving",
+        "emoji": "🗿",
+        "type": "museum"
+    },
+    {
+        "zh": "生活",
+        "tw": "sing-ua̍h",
+        "en": "Life",
+        "emoji": "🏡",
+        "type": "culture"
+    },
+    {
+        "zh": "民俗",
+        "tw": "bîn-sio̍k",
+        "en": "Folk Custom",
+        "emoji": "🏮",
+        "type": "culture"
+    },
+    {
+        "zh": "城",
+        "tw": "siâⁿ",
+        "en": "Castle/Wall",
+        "emoji": "🏯",
+        "type": "culture"
+    },
+    {
+        "zh": "儒學",
+        "tw": "jû-ha̍k",
+        "en": "Confucianism",
+        "emoji": "📜",
+        "type": "culture"
+    },
+    {
+        "zh": "大砲",
+        "tw": "tāi-phàu",
+        "en": "Cannon",
+        "emoji": "💣",
+        "type": "culture"
+    },
+    {
+        "zh": "忠臣",
+        "tw": "tiong-sîn",
+        "en": "Loyal Official",
+        "emoji": "🛡️",
+        "type": "culture"
+    },
+    {
+        "zh": "貞節",
+        "tw": "tsing-tsiat",
+        "en": "Chastity/Loyalty",
+        "emoji": "🌸",
+        "type": "culture"
+    },
+    {
+        "zh": "媽祖",
+        "tw": "Má-tsoo",
+        "en": "Matsu",
+        "emoji": "👵",
+        "type": "culture"
+    },
+    {
+        "zh": "關帝",
+        "tw": "Kuan-tè",
+        "en": "Guandi/War God",
+        "emoji": "🧔",
+        "type": "culture"
+    },
+    {
+        "zh": "百貨",
+        "tw": "pah-huè",
+        "en": "Department Store",
+        "emoji": "🛍️",
+        "type": "culture"
+    },
+    {
+        "zh": "塔",
+        "tw": "thah",
+        "en": "Pagoda/Tower",
+        "emoji": "🛕",
+        "type": "culture"
+    },
+    {
+        "zh": "渡輪",
+        "tw": "tōo-lûn",
+        "en": "Ferry",
+        "emoji": "🛳️",
+        "type": "water"
+    },
+    {
+        "zh": "菩薩",
+        "tw": "Phôo-sat",
+        "en": "Bodhisattva",
+        "emoji": "🧘",
+        "type": "culture"
+    },
+    {
+        "zh": "猴",
+        "tw": "kâu",
+        "en": "Monkey",
+        "emoji": "🐒",
+        "type": "nature"
+    },
+    {
+        "zh": "紙傘",
+        "tw": "tsuá-suànn",
+        "en": "Paper Umbrella",
+        "emoji": "☂️",
+        "type": "culture"
+    },
+    {
+        "zh": "鐵橋",
+        "tw": "thih-kiô",
+        "en": "Iron Bridge",
+        "emoji": "🌉",
+        "type": "land"
+    },
+    {
+        "zh": "歌",
+        "tw": "kua",
+        "en": "Song",
+        "emoji": "🎵",
+        "type": "culture"
+    },
+    {
+        "zh": "帆船",
+        "tw": "phân-tsûn",
+        "en": "Sailboat",
+        "emoji": "⛵",
+        "type": "water"
+    },
+    {
+        "zh": "眷村",
+        "tw": "kùn-tshuan",
+        "en": "Military Village",
+        "emoji": "🏡",
+        "type": "culture"
+    },
+    {
+        "zh": "芬多精",
+        "tw": "hun-to-tsing",
+        "en": "Phytoncide",
+        "emoji": "🌲",
+        "type": "nature"
+    },
+    {
+        "zh": "教堂",
+        "tw": "kàu-tn̂g",
+        "en": "Church",
+        "emoji": "⛪",
+        "type": "culture"
+    },
+    {
+        "zh": "歌劇",
+        "tw": "koa-ke̍k",
+        "en": "Opera",
+        "emoji": "🎭",
+        "type": "culture"
+    },
+    {
+        "zh": "甘蔗",
+        "tw": "kam-tsià",
+        "en": "Sugarcane",
+        "emoji": "🎋",
+        "type": "nature"
+    },
+    {
+        "zh": "吊橋",
+        "tw": "tiāu-kiô",
+        "en": "Suspension Bridge",
+        "emoji": "🌉",
+        "type": "land"
+    },
+    {
+        "zh": "和平",
+        "tw": "hô-pîng",
+        "en": "Peace",
+        "emoji": "🕊️",
+        "type": "culture"
+    },
+    {
+        "zh": "人權",
+        "tw": "jîn-khoân",
+        "en": "Human Rights",
+        "emoji": "✊",
+        "type": "culture"
+    },
+    {
+        "zh": "紀念",
+        "tw": "kì-liām",
+        "en": "Commemoration",
+        "emoji": "🕯️",
+        "type": "culture"
+    },
+    {
+        "zh": "民主",
+        "tw": "bîn-tsú",
+        "en": "Democracy",
+        "emoji": "🗳️",
+        "type": "culture"
+    },
+    {
+        "zh": "自由",
+        "tw": "tsū-iû",
+        "en": "Freedom",
+        "emoji": "🗽",
+        "type": "culture"
+    },
+    {
+        "zh": "真相",
+        "tw": "tsin-siòng",
+        "en": "Truth",
+        "emoji": "🔍",
+        "type": "culture"
+    },
+    {
+        "zh": "故宮",
+        "tw": "Kòo-kiong",
+        "en": "National Palace Museum",
+        "emoji": "🏛️",
+        "type": "place",
+        "county": "台北市"
+    },
+    {
+        "zh": "科博館",
+        "tw": "Kho-phok-koán",
+        "en": "Science Museum",
+        "emoji": "🦖",
+        "type": "place",
+        "county": "台中市"
+    },
+    {
+        "zh": "海生館",
+        "tw": "Hái-seng-koán",
+        "en": "Marine Biology Museum",
+        "emoji": "🦈",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "奇美博物館",
+        "tw": "Kî-bí Phok-bu̍t-koán",
+        "en": "Chimei Museum",
+        "emoji": "🎨",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "臺灣博物館",
+        "tw": "Tâi-oân Phok-bu̍t-koán",
+        "en": "National Taiwan Museum",
+        "emoji": "🏛️",
+        "type": "place",
+        "county": "台北市"
+    },
+    {
+        "zh": "蘭陽博物館",
+        "tw": "Lân-iûnn Phok-bu̍t-koán",
+        "en": "Lanyang Museum",
+        "emoji": "🏛️",
+        "type": "place",
+        "county": "宜蘭縣"
+    },
+    {
+        "zh": "史前館",
+        "tw": "Sú-tsîng-koán",
+        "en": "Museum of Prehistory",
+        "emoji": "🏺",
+        "type": "place",
+        "county": "台東縣"
+    },
+    {
+        "zh": "科工館",
+        "tw": "Kho-kang-koán",
+        "en": "Science & Technology Museum",
+        "emoji": "🏗️",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "國美館",
+        "tw": "Kok-bí-koán",
+        "en": "National Art Museum",
+        "emoji": "🎨",
+        "type": "place",
+        "county": "台中市"
+    },
+    {
+        "zh": "海科館",
+        "tw": "Hái-kho-koán",
+        "en": "Marine Science Museum",
+        "emoji": "🚢",
+        "type": "place",
+        "county": "基隆市"
+    },
+    {
+        "zh": "十三行",
+        "tw": "Tsa̍p-sann-hâng",
+        "en": "Shihsanhang Archaeology Museum",
+        "emoji": "🏺",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "黃金博物館",
+        "tw": "N̂g-kim Phok-bu̍t-koán",
+        "en": "Gold Museum",
+        "emoji": "🪙",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "北美館",
+        "tw": "Pak-bí-koán",
+        "en": "Taipei Fine Arts Museum",
+        "emoji": "🎨",
+        "type": "place",
+        "county": "台北市"
+    },
+    {
+        "zh": "高美館",
+        "tw": "Ko-bí-koán",
+        "en": "Kaohsiung Museum of Fine Arts",
+        "emoji": "🖼️",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "陶瓷博物館",
+        "tw": "Ing-ko Tô-hûi Phok-bu̍t-koán",
+        "en": "Yingge Ceramics Museum",
+        "emoji": "🏺",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "左鎮化石園區",
+        "tw": "Tsó-tìn Huà-tsio̍h Hn̂g-khu",
+        "en": "Zuojhen Fossil Park",
+        "emoji": "🦣",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "南科考古館",
+        "tw": "Lâm-kho Khó-kóo-koán",
+        "en": "Museum of Archaeology (Tainan)",
+        "emoji": "🪨",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "臺灣歷史博物館",
+        "tw": "Tâi-oân Li̍k-sú Phok-bu̍t-koán",
+        "en": "National Museum of Taiwan History",
+        "emoji": "🚢",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "臺灣文學館",
+        "tw": "Tâi-oân Bûn-ha̍k Phok-bu̍t-koán",
+        "en": "National Museum of Taiwan Literature",
+        "emoji": "📚",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "科教館",
+        "tw": "Kho-kàu-koán",
+        "en": "Science Education Center",
+        "emoji": "🔬",
+        "type": "place",
+        "county": "台北市"
+    },
+    {
+        "zh": "當代藝術館",
+        "tw": "Tòng-tāi Gē-su̍t-koán",
+        "en": "Museum of Contemporary Art Taipei",
+        "emoji": "🏙️",
+        "type": "place",
+        "county": "台北市"
+    },
+    {
+        "zh": "郵政博物館",
+        "tw": "Iû-tsìng Phok-bu̍t-koán",
+        "en": "Postal Museum",
+        "emoji": "📮",
+        "type": "place",
+        "county": "台北市"
+    },
+    {
+        "zh": "歷史博物館",
+        "tw": "Sú-phok-koán",
+        "en": "National Museum of History",
+        "emoji": "🏺",
+        "type": "place",
+        "county": "台北市"
+    },
+    {
+        "zh": "茶業博物館",
+        "tw": "Tê-gia̍p Phok-bu̍t-koán",
+        "en": "Pinglin Tea Museum",
+        "emoji": "🍵",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "泰雅博物館",
+        "tw": "Thài-ia Phok-bu̍t-koán",
+        "en": "Ulay Atayal Museum",
+        "emoji": "🏹",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "橫山書法館",
+        "tw": "Hîng-san Su-huat-koán",
+        "en": "Hengshan Calligraphy Art Center",
+        "emoji": "🖌️",
+        "type": "place",
+        "county": "桃園市"
+    },
+    {
+        "zh": "大溪木藝館",
+        "tw": "Tāi-khe Bo̍k-gī-koán",
+        "en": "Daxi Wood Art Museum",
+        "emoji": "🪵",
+        "type": "place",
+        "county": "桃園市"
+    },
+    {
+        "zh": "玻璃工藝館",
+        "tw": "Pō-lê Kang-gī-koán",
+        "en": "Glass Crafts Museum",
+        "emoji": "🍺",
+        "type": "place",
+        "county": "新竹市"
+    },
+    {
+        "zh": "影像紀念館",
+        "tw": "Íng-siōng Kì-liām-koán",
+        "en": "Deng Nan-guang Photo Museum",
+        "emoji": "📷",
+        "type": "place",
+        "county": "新竹縣"
+    },
+    {
+        "zh": "客家文化館",
+        "tw": "Kheh-ka Bûn-huà-koán",
+        "en": "Taiwan Hakka Museum",
+        "emoji": "🏮",
+        "type": "place",
+        "county": "苗栗縣"
+    },
+    {
+        "zh": "木雕博物館",
+        "tw": "Bo̍k-tiau Phok-bu̍t-koán",
+        "en": "Sanyi Wood Sculpture Museum",
+        "emoji": "🪵",
+        "type": "place",
+        "county": "苗栗縣"
+    },
+    {
+        "zh": "台灣玻璃館",
+        "tw": "Tâi-oân Pō-lê-koán",
+        "en": "Taiwan Glass Gallery",
+        "emoji": "🍺",
+        "type": "place",
+        "county": "彰化縣"
+    },
+    {
+        "zh": "中台世界博物館",
+        "tw": "Tiong-tâi Sè-kài Phok-bu̍t-koán",
+        "en": "Chung Tai World Museum",
+        "emoji": "🌐",
+        "type": "place",
+        "county": "南投縣"
+    },
+    {
+        "zh": "工藝園區",
+        "tw": "Kang-gī Hn̂g-khu",
+        "en": "Taiwan Craft Institute",
+        "emoji": "🏗️",
+        "type": "place",
+        "county": "南投縣"
+    },
+    {
+        "zh": "布袋戲館",
+        "tw": "Poo-tē-hì-koán",
+        "en": "Yunlin Hand Puppet Museum",
+        "emoji": "🎭",
+        "type": "place",
+        "county": "雲林縣"
+    },
+    {
+        "zh": "故宮南院",
+        "tw": "Kòo-kiong Lâm-īnn",
+        "en": "Southern Branch of Palace Museum",
+        "emoji": "🏛️",
+        "type": "place",
+        "county": "嘉義縣"
+    },
+    {
+        "zh": "嘉美館",
+        "tw": "Ka-bí-koán",
+        "en": "Chiayi Art Museum",
+        "emoji": "🎨",
+        "type": "place",
+        "county": "嘉義市"
+    },
+    {
+        "zh": "美術館二館",
+        "tw": "Tâi-lâm Sī Bí-su̍t-koán",
+        "en": "Tainan Art Museum",
+        "emoji": "🎨",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "高史博",
+        "tw": "Ko-hiông Li̍k-sú Phok-bu̍t-koán",
+        "en": "Kaohsiung Museum of History",
+        "emoji": "🏛️",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "屏東菸廠",
+        "tw": "Pîn-tong Iat-tshiánn",
+        "en": "Pingtung 1936 Shared Office",
+        "emoji": "🍂",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "傳藝中心",
+        "tw": "Thoân-gē Tiong-sim",
+        "en": "National Traditional Arts Center",
+        "emoji": "🏺",
+        "type": "place",
+        "county": "宜蘭縣"
+    },
+    {
+        "zh": "石雕博物館",
+        "tw": "Tsioh-tiau Phok-bu̍t-koán",
+        "en": "Hualien Stone Sculptures Museum",
+        "emoji": "🗿",
+        "type": "place",
+        "county": "花蓮縣"
+    },
+    {
+        "zh": "澎湖生博館",
+        "tw": "Phêⁿ-ôo Sing-ua̍h Phok-bu̍t-koán",
+        "en": "Penghu Living Museum",
+        "emoji": "🏡",
+        "type": "place",
+        "county": "澎湖縣"
+    },
+    {
+        "zh": "金門民俗館",
+        "tw": "Kim-mn̂g Bîn-sio̍k-koán",
+        "en": "Kinmen Historical Folk Museum",
+        "emoji": "🏮",
+        "type": "place",
+        "county": "金門縣"
+    },
+    {
+        "zh": "馬祖民俗館",
+        "tw": "Má-tsoo Bîn-sio̍k-koán",
+        "en": "Matsu Folk Culture Museum",
+        "emoji": "🏮",
+        "type": "place",
+        "county": "連江縣"
+    },
+    {
+        "zh": "赤崁樓",
+        "tw": "Tshiah-khám-lâu",
+        "en": "Chihkan Tower",
+        "emoji": "🏯",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "孔廟",
+        "tw": "Khóng-biō",
+        "en": "Confucian Temple",
+        "emoji": "📜",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "億載金城",
+        "tw": "It-tāi-kim-siânn",
+        "en": "Eternal Golden Castle",
+        "emoji": "💣",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "延平郡王祠",
+        "tw": "Iân-pîng Kūn-ông-sû",
+        "en": "Koxinga Shrine",
+        "emoji": "🛡️",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "五妃廟",
+        "tw": "Gōo-hui-biō",
+        "en": "Five Concubines Temple",
+        "emoji": "🌸",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "大天后宮",
+        "tw": "Tāi-thian-hōo-kiong",
+        "en": "Grand Matsu Temple",
+        "emoji": "👵",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "祀典武廟",
+        "tw": "Sū-tián-bú-biō",
+        "en": "Official War Temple",
+        "emoji": "🧔",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "林百貨",
+        "tw": "Lîm Pah-huè",
+        "en": "Hayashi Department Store",
+        "emoji": "🛍️",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "佛光山",
+        "tw": "Hu̍t-kong-soaⁿ",
+        "en": "Fo Guang Shan",
+        "emoji": "⛩️",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "美濃客家庄",
+        "tw": "Bí-nông",
+        "en": "Meinong Hakka Village",
+        "emoji": "☂️",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "舊鐵橋",
+        "tw": "Tuā-tshiū Kū-thih-kiô",
+        "en": "Dashu Old Railway Bridge",
+        "emoji": "🌉",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "鵝鑾鼻燈塔",
+        "tw": "Gô-lân-pī Teng-thah",
+        "en": "Eluanbi Lighthouse",
+        "emoji": "🗼",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "勝利星村",
+        "tw": "Sìng-lī Tshing-tshuan",
+        "en": "Shengli Star Village",
+        "emoji": "🏡",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "萬金聖母聖殿",
+        "tw": "Bān-kim Sèng-tông",
+        "en": "Wanjin Catholic Sanctuary",
+        "emoji": "⛪",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "山川琉璃吊橋",
+        "tw": "San-tshuan Liû-lî Tiāu-kiô",
+        "en": "Shanchuan Suspension Bridge",
+        "emoji": "🌉",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "野柳",
+        "tw": "Iá-liú",
+        "en": "Yehliu Geopark",
+        "emoji": "🗿",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "陽明山",
+        "tw": "Iûnn-bîng-soaⁿ",
+        "en": "Yangmingshan",
+        "emoji": "🌋",
+        "type": "place",
+        "county": "台北市"
+    },
+    {
+        "zh": "太魯閣",
+        "tw": "Thài-lóo-koh",
+        "en": "Taroko Gorge",
+        "emoji": "🪨",
+        "type": "place",
+        "county": "花蓮縣"
+    },
+    {
+        "zh": "清水斷崖",
+        "tw": "Chheng-chúi Toān-gâi",
+        "en": "Qingshui Cliff",
+        "emoji": "🏔️",
+        "type": "place",
+        "county": "花蓮縣"
+    },
+    {
+        "zh": "日月潭",
+        "tw": "Ji̍t-goa̍t-thâm",
+        "en": "Sun Moon Lake",
+        "emoji": "💧",
+        "type": "place",
+        "county": "南投縣"
+    },
+    {
+        "zh": "濁水溪",
+        "tw": "Lô-chúi-khe",
+        "en": "Zhuoshui River",
+        "emoji": "🏞️",
+        "type": "place",
+        "county": "彰化縣"
+    },
+    {
+        "zh": "玉山",
+        "tw": "Gio̍k-soaⁿ",
+        "en": "Jade Mountain",
+        "emoji": "⛰️",
+        "type": "place",
+        "county": "南投縣"
+    },
+    {
+        "zh": "阿里山",
+        "tw": "A-lí-soaⁿ",
+        "en": "Alishan",
+        "emoji": "🌲",
+        "type": "place",
+        "county": "嘉義縣"
+    },
+    {
+        "zh": "高美濕地",
+        "tw": "Ko-bí Si̍p-tē",
+        "en": "Gaomei Wetlands",
+        "emoji": "🦀",
+        "type": "place",
+        "county": "台中市"
+    },
+    {
+        "zh": "十分瀑布",
+        "tw": "Si̍p-hun Pha̍k-poo",
+        "en": "Shifen Waterfall",
+        "emoji": "🌊",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "愛河",
+        "tw": "Ài-hô",
+        "en": "Love River",
+        "emoji": "🛥️",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "墾丁",
+        "tw": "Khún-teng",
+        "en": "Kenting",
+        "emoji": "🏖️",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "蓮池潭",
+        "tw": "Liân-tî-thâm",
+        "en": "Lotus Pond",
+        "emoji": "🛕",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "西子灣",
+        "tw": "Se-tsú-uân",
+        "en": "Sizihwan",
+        "emoji": "🌅",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "大鵬灣",
+        "tw": "Tāi-phîng-uân",
+        "en": "Dapeng Bay",
+        "emoji": "⛵",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "四重溪溫泉",
+        "tw": "Sù-tiông-khe",
+        "en": "Sichongxi Hot Spring",
+        "emoji": "♨️",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "雙流森林",
+        "tw": "Siang-lîu Sîng-lîm",
+        "en": "Shuangliu Forest",
+        "emoji": "🌲",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "龜山島",
+        "tw": "Ku-soaⁿ-tó",
+        "en": "Guishan Island",
+        "emoji": "🐢",
+        "type": "place",
+        "county": "宜蘭縣"
+    },
+    {
+        "zh": "澎湖",
+        "tw": "Phêⁿ-ôo",
+        "en": "Penghu",
+        "emoji": "🏝️",
+        "type": "place",
+        "county": "澎湖縣"
+    },
+    {
+        "zh": "蘭嶼",
+        "tw": "Lân-sū",
+        "en": "Orchid Island",
+        "emoji": "🐟",
+        "type": "place",
+        "county": "台東縣"
+    },
+    {
+        "zh": "綠島",
+        "tw": "Li̍k-tó",
+        "en": "Green Island",
+        "emoji": "🪸",
+        "type": "place",
+        "county": "台東縣"
+    },
+    {
+        "zh": "小琉球",
+        "tw": "Sió-liû-kiû",
+        "en": "Xiaoliuqiu",
+        "emoji": "🐢",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "旗津",
+        "tw": "Kî-tin",
+        "en": "Cijin Island",
+        "emoji": "⛴️",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "壽山",
+        "tw": "Siū-soaⁿ",
+        "en": "Shoushan",
+        "emoji": "🐒",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "衛武營",
+        "tw": "Uē-bú-înn",
+        "en": "Weiwuying Center for the Arts",
+        "emoji": "🎭",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "糖廠",
+        "tw": "Kiâu-thâu Thn̂g-tshióng",
+        "en": "Ciaotou Sugar Refinery",
+        "emoji": "🎋",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "九份",
+        "tw": "Káu-hūn",
+        "en": "Jiufen Old Street",
+        "emoji": "🏮",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "淡水",
+        "tw": "Tām-chúi",
+        "en": "Tamsui",
+        "emoji": "🌅",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "安平古堡",
+        "tw": "An-pêng Kóo-pó",
+        "en": "Anping Fort",
+        "emoji": "🏰",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "駁二藝術特區",
+        "tw": "Phak-jī Gē-su̍t Ti̍k-khu",
+        "en": "Pier-2 Art Center",
+        "emoji": "🤖",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "高流",
+        "tw": "Ko-hiông Liû-hîng Im-gia̍k Tiong-sim",
+        "en": "Music Center",
+        "emoji": "🎵",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "基隆二二八紀念碑",
+        "tw": "Ki-liông Jī-jī-pat Kì-liām-pi",
+        "en": "Keelung 228 Memorial Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "基隆市"
+    },
+    {
+        "zh": "八堵站二二八紀念碑",
+        "tw": "Pat-tóo-tsām Jī-jī-pat Kì-liām-pi",
+        "en": "Badu Station 228 Railway Workers Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "基隆市"
+    },
+    {
+        "zh": "中央二二八紀念碑",
+        "tw": "Tiong-ng Jī-jī-pat Kì-liām-pi",
+        "en": "National 228 Memorial Monument (Taipei)",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "台北市"
+    },
+    {
+        "zh": "二二八引爆地紀念碑",
+        "tw": "Jī-jī-pat Ín-po̍k-tē Kì-liām-pi",
+        "en": "228 Incident Spark Site Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "台北市"
+    },
+    {
+        "zh": "三重二二八紀念公園",
+        "tw": "Sam-tîng Jī-jī-pat Kong-hn̂g",
+        "en": "Sanchong 228 Peace Memorial Park",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "淡水埔頂二二八紀念碑",
+        "tw": "Phu-tíng Jī-jī-pat Kì-liām-pi",
+        "en": "Tamsui Puding 228 Memorial Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "新北市"
+    },
+    {
+        "zh": "桃園二二八紀念公園",
+        "tw": "Thô-hn̂g Jī-jī-pat Kong-hn̂g",
+        "en": "Taoyuan 228 Memorial Park (Luzhu)",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "桃園市"
+    },
+    {
+        "zh": "新竹市二二八紀念碑",
+        "tw": "Sin-tik-tshī Jī-jī-pat Kì-liām-pi",
+        "en": "Hsinchu City 228 Memorial Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "新竹市"
+    },
+    {
+        "zh": "臺中市東峰二二八紀念碑",
+        "tw": "Tâi-tiong Tang-hong Kì-liām-pi",
+        "en": "Taichung Dongfeng 228 Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "台中市"
+    },
+    {
+        "zh": "大里二二八紀念碑",
+        "tw": "Tāi-lí Jī-jī-pat Kì-liām-pi",
+        "en": "Taichung Dali 228 Memorial Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "台中市"
+    },
+    {
+        "zh": "靜宜大學二二八紀念碑",
+        "tw": "Tsīng-gî Tāi-ha̍k Kì-liām-pi",
+        "en": "Providence University 228 Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "台中市"
+    },
+    {
+        "zh": "彰化縣二二八紀念碑",
+        "tw": "Tsiong-huà Jī-jī-pat Kì-liām-pi",
+        "en": "Changhua County 228 Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "彰化縣"
+    },
+    {
+        "zh": "烏牛欄戰役紀念碑",
+        "tw": "Oo-gû-lân Tsiàn-e̍k Kì-liām-pi",
+        "en": "Wuniulan Battle 228 Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "南投縣"
+    },
+    {
+        "zh": "竹山二二八紀念碑",
+        "tw": "Tik-soaⁿ Jī-jī-pat Kì-liām-pi",
+        "en": "Zhushan 228 Memorial Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "南投縣"
+    },
+    {
+        "zh": "古坑二二八紀念碑",
+        "tw": "Kóo-kheⁿ Jī-jī-pat Kì-liām-pi",
+        "en": "Gukeng 228 Memorial Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "雲林縣"
+    },
+    {
+        "zh": "雲林縣二二八紀念碑",
+        "tw": "Hûn-lîm-koān Jī-jī-pat Kì-liām-pi",
+        "en": "Yunlin County 228 Memorial Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "雲林縣"
+    },
+    {
+        "zh": "嘉義市二二八紀念碑",
+        "tw": "Ka-gī-tshī Jī-jī-pat Kì-liām-pi",
+        "en": "Chiayi City 228 Monument (First in Taiwan)",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "嘉義市"
+    },
+    {
+        "zh": "嘉義市二二八紀念公園碑",
+        "tw": "Ka-gī Jī-jī-pat Kong-hn̂g-pi",
+        "en": "Chiayi 228 Memorial Park Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "嘉義市"
+    },
+    {
+        "zh": "嘉義二二八國家紀念公園",
+        "tw": "Ka-gī Kok-ka Jī-jī-pat Kong-hn̂g",
+        "en": "Chiayi 228 National Memorial Park",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "嘉義市"
+    },
+    {
+        "zh": "阿里山二二八紀念碑",
+        "tw": "A-lí-soaⁿ Jī-jī-pat Kì-liām-pi",
+        "en": "Alishan 228 Indigenous Memorial",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "嘉義縣"
+    },
+    {
+        "zh": "臺南市二二八紀念公園",
+        "tw": "Tâi-lâm-tshī Jī-jī-pat Kong-hn̂g",
+        "en": "Tainan City 228 Memorial Park (Anping)",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "新營二二八紀念碑",
+        "tw": "Sin-iânn Jī-jī-pat Kì-liām-pi",
+        "en": "Xinying 228 Memorial Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "台南市"
+    },
+    {
+        "zh": "岡山二二八和平紀念碑",
+        "tw": "Kong-san Jī-jī-pat Kì-liām-pi",
+        "en": "Gangshan 228 Peace Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "壽山二二八和平紀念碑",
+        "tw": "Siū-soaⁿ Jī-jī-pat Kì-liām-pi",
+        "en": "Shoushan 228 Peace Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "高雄市二二八和平紀念公園",
+        "tw": "Ko-hiông Jī-jī-pat Kong-hn̂g",
+        "en": "Kaohsiung 228 Peace Memorial Park",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "高雄市"
+    },
+    {
+        "zh": "屏東公園二二八紀念碑",
+        "tw": "Pîn-tong Kong-hn̂g Kì-liām-pi",
+        "en": "Pingtung Park 228 Memorial Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "林邊二二八紀念碑",
+        "tw": "Nâ-piⁿ Jī-jī-pat Kì-liām-pi",
+        "en": "Linbian 228 Memorial Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "屏東縣"
+    },
+    {
+        "zh": "宜蘭二二八紀念物",
+        "tw": "Gî-lân Jī-jī-pat Kì-liām-bu̍t",
+        "en": "Yilan 228 Memorial (Mirror of History)",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "宜蘭縣"
+    },
+    {
+        "zh": "花蓮關懷二二八紀念碑",
+        "tw": "Hua-liân Koan-hoâi Kì-liām-pi",
+        "en": "Hualien 228 Caring Peace Monument",
+        "emoji": "🕊️",
+        "type": "place",
+        "county": "花蓮縣"
+    }
+]

@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>景點博物館四界行 — 歡喜學台語</title>
+    <meta name="description" content="台灣景點與博物館台語互動教學網頁，透過互動地圖、詞彙牆與台語聽力挑戰，歡喜學台語！">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Noto+Sans+TC:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+/* ===== CSS Variables & Theming ===== */
+:root {
+    --primary: #00827F;
+    --primary-hover: #006764;
+    --secondary: #E60012;
+    --orange-line: #F39800;
+    --accent: #FFEAA7;
+    --bg-gradient: linear-gradient(135deg, #E8F6F3 0%, #D5F5E3 30%, #EBF5FB 70%, #FDEBD0 100%);
+    --card-bg: rgba(255, 255, 255, 0.82);
+    --card-border: rgba(255, 255, 255, 0.6);
+    --text: #2D3436;
+    --text-light: #636E72;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    --shadow-active: 0 15px 35px rgba(0, 130, 127, 0.25);
+    --border-radius: 24px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-theme="dark"] {
+    --primary: #00A29F;
+    --primary-hover: #00C2BE;
+    --secondary: #FF4D4D;
+    --orange-line: #FFA502;
+    --accent: #FDCB6E;
+    --bg-gradient: linear-gradient(135deg, #1a2332 0%, #0d1b2a 50%, #1b2838 100%);
+    --card-bg: rgba(30, 39, 46, 0.85);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text: #F5F6FA;
+    --text-light: #A5B1C2;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --shadow-active: 0 15px 35px rgba(0, 162, 159, 0.35);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+    font-family: 'Fredoka', 'Noto Sans TC', 'Outfit', sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background 0.5s ease, color 0.3s ease;
+    overflow-x: hidden;
+}
+
+/* ===== Header ===== */
+header {
+    width: 100%; max-width: 1060px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    padding: 15px 25px;
+    background: var(--card-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    border: 2px solid var(--card-border); border-radius: var(--border-radius);
+    box-shadow: var(--shadow); margin-bottom: 22px; transition: var(--transition);
+}
+.logo-section h1 {
+    font-size: 1.5rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--primary), #27ae60, var(--orange-line));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    display: flex; align-items: center; gap: 8px;
+}
+.logo-section small { display: block; font-size: 0.78rem; color: var(--text-light); font-weight: 500; margin-top: 2px; }
+.header-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.speech-badge {
+    padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700;
+    white-space: nowrap; transition: var(--transition);
+}
+.badge-online { background: linear-gradient(135deg, #00B894, #00CEC9); color: white; }
+.badge-offline { background: linear-gradient(135deg, #636E72, #2D3436); color: #dfe6e9; }
+
+.rate-controller {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--card-bg); padding: 5px 10px; border-radius: 50px;
+    border: 2px solid var(--card-border); font-size: 0.85rem; color: var(--text-light);
+}
+.rate-controller input[type="range"] { width: 70px; accent-color: var(--primary); cursor: pointer; }
+.rate-label { font-size: 0.78rem; font-weight: 700; min-width: 28px; color: var(--primary); }
+
+.btn-icon {
+    background: var(--card-bg); border: 2px solid var(--card-border); color: var(--text);
+    width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 1.15rem;
+    box-shadow: var(--shadow); transition: var(--transition);
+}
+.btn-icon:hover { transform: translateY(-2px) scale(1.05); background: var(--primary); color: white; border-color: var(--primary); }
+
+/* ===== Tabs ===== */
+.nav-tabs {
+    width: 100%; max-width: 1060px;
+    display: flex; gap: 10px; margin-bottom: 22px; overflow-x: auto; padding-bottom: 4px;
+    scrollbar-width: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.tab-trigger {
+    flex: 1; min-width: 115px; padding: 13px 8px;
+    background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 18px;
+    color: var(--text-light); font-size: 0.9rem; font-weight: 700; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    box-shadow: var(--shadow); transition: var(--transition);
+}
+.tab-trigger i { font-size: 1.25rem; transition: var(--transition); }
+.tab-trigger:hover { color: var(--primary); transform: translateY(-2px); border-color: var(--primary); }
+.tab-trigger.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: var(--shadow-active); transform: translateY(-2px); }
+.tab-trigger.active i { transform: scale(1.15); }
+
+/* ===== Panels & Cards ===== */
+.tab-panel { display: none; width: 100%; max-width: 1060px; animation: fadeIn 0.4s ease forwards; }
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.two-col-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 28px; }
+
+.card {
+    background: var(--card-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    border: 2px solid var(--card-border); border-radius: var(--border-radius);
+    padding: 25px; box-shadow: var(--shadow); transition: var(--transition);
+    position: relative; overflow: hidden;
+}
+.card-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 18px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+
+/* ===== Location List ===== */
+#location-list { max-height: 520px; overflow-y: auto; padding-right: 8px; }
+#location-list::-webkit-scrollbar { width: 5px; }
+#location-list::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+.loc-btn {
+    width: 100%; padding: 13px; background: var(--card-bg); border: 2px solid var(--card-border);
+    border-radius: 16px; color: var(--text); font-size: 1.05rem; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: var(--transition);
+    display: flex; align-items: center; gap: 14px; margin-bottom: 10px; text-align: left;
+}
+.loc-btn:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-active); }
+.loc-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.loc-icon { font-size: 1.7rem; flex-shrink: 0; }
+
+/* ===== Audio Play Button ===== */
+.audio-box { display: flex; justify-content: center; margin-bottom: 15px; }
+.btn-play-audio {
+    width: 65px; height: 65px; border: none; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: white; font-size: 1.7rem; cursor: pointer;
+    box-shadow: 0 8px 25px rgba(0, 130, 127, 0.35);
+    display: flex; align-items: center; justify-content: center; transition: var(--transition);
+}
+.btn-play-audio:hover { transform: scale(1.08); box-shadow: 0 10px 30px rgba(0, 130, 127, 0.5); }
+
+/* ===== CTA Button ===== */
+.btn-cta {
+    width: 100%; padding: 15px; border: none; border-radius: 18px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: white; font-size: 1.05rem; font-weight: 800; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 130, 127, 0.3);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-top: 22px; transition: var(--transition);
+}
+.btn-cta:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0, 130, 127, 0.45); }
+
+/* ===== Leaflet Map ===== */
+#leaflet-map { width: 100%; height: 580px; border-radius: 18px; border: 2px solid var(--card-border); }
+.leaflet-popup-content-wrapper {
+    border-radius: 16px !important; box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+    font-family: 'Fredoka','Noto Sans TC',sans-serif !important; max-width: 280px;
+}
+.leaflet-popup-content { margin: 14px 16px !important; }
+.map-popup-title { font-size: 1.1rem; font-weight: 800; color: var(--primary, #00827F); margin-bottom: 3px; }
+.map-popup-pinyin { font-size: 0.85rem; color: #636E72; font-weight: 600; margin-bottom: 6px; }
+.map-popup-vocab { background: #FFEAA7; color: #2D3436; padding: 4px 10px; border-radius: 10px;
+    font-size: 0.8rem; font-weight: 700; display: inline-block; margin-bottom: 8px; }
+.map-popup-desc { font-size: 0.82rem; line-height: 1.5; color: #2D3436; margin-bottom: 10px; }
+.map-popup-play { background: #00827F; color: white; border: none; border-radius: 10px;
+    padding: 6px 14px; font-size: 0.85rem; font-weight: 700; cursor: pointer; width: 100%; }
+.map-popup-play:hover { background: #006764; }
+.map-marker-icon { background: none; border: none; }
+.marker-pin {
+    width: 32px; height: 32px; border-radius: 50% 50% 50% 0; background: var(--mc, #00827F);
+    border: 3px solid white; transform: rotate(-45deg);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25); transition: transform 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.marker-pin .pin-inner { transform: rotate(45deg); font-size: 14px; }
+.marker-active .marker-pin { background: #E60012 !important; transform: rotate(-45deg) scale(1.3); }
+
+/* ===== Vocabulary Wall ===== */
+.vocab-filter { display: flex; gap: 8px; margin-bottom: 18px; width: 100%; justify-content: center; flex-wrap: wrap; }
+.filter-btn {
+    padding: 7px 14px; border: 2px solid var(--card-border); background: var(--card-bg);
+    color: var(--text); border-radius: 50px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+    box-shadow: var(--shadow); transition: var(--transition);
+}
+.filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: var(--shadow-active); }
+.action-btn {
+    padding: 8px 18px; border: 2px solid var(--primary); background: transparent;
+    color: var(--primary); border-radius: 50px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow); transition: var(--transition);
+}
+.action-btn:hover {
+    background: var(--primary); color: white; transform: translateY(-2px); box-shadow: var(--shadow-active);
+}
+.vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 16px; }
+.vocab-card {
+    background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 20px;
+    padding: 18px; text-align: center; cursor: pointer; box-shadow: var(--shadow); transition: var(--transition);
+}
+.vocab-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-active); }
+.vocab-emoji { font-size: 2rem; display: block; margin-bottom: 10px; }
+.vocab-zh { font-size: 1.1rem; font-weight: 800; margin-bottom: 3px; }
+.vocab-pinyin { font-size: 0.82rem; color: var(--primary); font-weight: 700; margin-bottom: 2px; }
+.vocab-en { font-size: 0.78rem; color: var(--text-light); font-weight: 500; }
+
+/* ===== Quiz ===== */
+.quiz-header { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.9rem; margin-bottom: 14px; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+.timer-bar-container { width: 100%; height: 6px; background: rgba(0,0,0,0.05); border-radius: 5px; margin-bottom: 22px; }
+.timer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, var(--primary), #27ae60); border-radius: 5px; transition: width 0.3s linear; }
+.quiz-question-txt { text-align: center; font-size: 1.1rem; font-weight: 800; margin-bottom: 22px; }
+.quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.option-btn {
+    padding: 13px 18px; background: var(--card-bg); border: 2px solid var(--card-border);
+    border-radius: 16px; color: var(--text); font-size: 1.05rem; font-weight: 700;
+    cursor: pointer; transition: var(--transition); text-align: left;
+}
+.option-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+.option-btn.correct { background: #00B894 !important; color: white !important; border-color: #00B894 !important; }
+.option-btn.wrong { background: #FF7675 !important; color: white !important; border-color: #FF7675 !important; }
+.quiz-feedback { text-align: center; font-size: 1.15rem; font-weight: 800; margin-top: 18px; min-height: 24px; }
+
+/* ===== Footer ===== */
+footer {
+    width: 100%; max-width: 1060px; text-align: center; padding: 30px 20px 15px;
+    color: var(--text-light); font-size: 0.82rem; font-weight: 600; line-height: 1.6;
+}
+
+/* ===== Animations ===== */
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.animate-pulse { animation: pulse 2s ease-in-out infinite; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .two-col-layout { grid-template-columns: 1fr; }
+    .quiz-options { grid-template-columns: 1fr; }
+    header { flex-direction: column; text-align: center; }
+    .header-controls { justify-content: center; }
+    .logo-section h1 { font-size: 1.3rem; justify-content: center; }
+}
+    </style>
+</head>
+<body>
+
+    <!-- ===== Header ===== -->
+    <header>
+        <div class="logo-section">
+            <h1><i class="fa-solid fa-earth-asia"></i> 景點博物館四界行</h1>
+            <small>歡喜學台語 — Tâi-oân Kéng-tiám Sì-kè-kiâⁿ</small>
+        </div>
+        <div class="header-controls">
+            <span id="speech-engine-badge" class="speech-badge badge-offline">🔊 語音就緒</span>
+            <button id="sandhi-toggle-btn" class="filter-btn active" onclick="toggleToneSandhi()" 
+                    style="padding: 4px 10px; font-size: 0.78rem; border-radius: 12px; cursor: pointer; border: 1.5px solid var(--card-border); font-weight: 700;" 
+                    title="切換「道地連音變調」或「字典查詢本調」發音模式">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> 連音變調：開
+            </button>
+            <div class="rate-controller" title="調整語速 Speech Speed">
+                <i class="fa-solid fa-gauge-high"></i>
+                <input type="range" id="speech-rate" min="0.5" max="2.5" step="0.1" value="0.9"
+                       onchange="updateSpeechRate(this.value)" oninput="updateRateLabel(this.value)" aria-label="Speech rate">
+                <span id="speech-rate-label" class="rate-label">0.9x</span>
+            </div>
+            <button id="theme-toggle-btn" class="btn-icon" onclick="toggleTheme()" aria-label="切換深色模式" title="切換深色模式">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== Navigation Tabs ===== -->
+    <nav class="nav-tabs" aria-label="Main Navigation">
+        <button id="tab-explore-btn" class="tab-trigger active" onclick="switchTab('explore')">
+            <i class="fa-solid fa-mountain-sun"></i><span>景點探索</span>
+        </button>
+        <button id="tab-map-btn" class="tab-trigger" onclick="switchTab('map')">
+            <i class="fa-solid fa-compass"></i><span>台灣地圖</span>
+        </button>
+        <button id="tab-vocab-btn" class="tab-trigger" onclick="switchTab('vocab')">
+            <i class="fa-solid fa-book-open"></i><span>詞彙牆</span>
+        </button>
+        <button id="tab-quiz-btn" class="tab-trigger" onclick="switchTab('quiz')">
+            <i class="fa-solid fa-gamepad"></i><span>台語挑戰</span>
+        </button>
+    </nav>
+
+    <!-- ===== Main Content ===== -->
+    <main style="width: 100%; max-width: 1060px;">
+        <!-- Tab 1: Explore -->
+        <section id="panel-explore" class="tab-panel active">
+            <div class="two-col-layout">
+                <div class="card" style="padding: 18px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 class="card-title" style="margin-bottom: 0; font-size: 1.1rem;"><i class="fa-solid fa-compass"></i> 景點列表 (Places)</h3>
+                        <span id="loc-list-count" style="font-size: 0.82rem; font-weight: 700; color: var(--text-light);"></span>
+                    </div>
+                    <select id="explore-county-filter" onchange="filterExploreList(this.value)" class="filter-btn" style="width: 100%; padding: 8px 12px; margin-bottom: 12px; font-weight: 700; border-radius: 12px; background: var(--card-bg); color: var(--text); border: 1.5px solid var(--card-border); outline: none;">
+                        <option value="all">所有縣市 All Counties</option>
+                    </select>
+                    <div id="location-list"></div>
+                </div>
+                <div class="card" id="location-detail">
+                    <div class="audio-box" style="float: right; margin-left: 14px;">
+                        <button class="btn-play-audio" onclick="playCurrentLocationAudio()" title="播放台語發音">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                    <h2 class="card-title" id="loc-title" style="font-size: 2rem; margin-bottom: 4px;"></h2>
+                    <div id="loc-pinyin" style="font-size: 1.3rem; color: var(--primary); font-weight: 800; margin-bottom: 18px;"></div>
+                    <div id="loc-vocab" style="background: var(--accent); padding: 10px 16px; border-radius: 16px; font-weight: 700; margin-bottom: 22px; color: #2D3436; display: inline-block; font-size: 0.95rem;"></div>
+                    <p id="loc-desc" style="font-size: 1.1rem; line-height: 1.65; clear: both;"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 2: Interactive Map (Leaflet) -->
+        <section id="panel-map" class="tab-panel">
+            <div id="map-county-controls" class="card" style="margin-bottom: 12px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="font-weight: 800; font-size: 0.95rem; color: var(--primary); display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-location-crosshairs"></i> 縣市地圖快速跳轉 (Quick-Zoom Counties):
+                </div>
+                <div id="map-county-tags" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <!-- Tags will be dynamically populated -->
+                </div>
+            </div>
+            <div id="leaflet-map" style="border-radius:24px; border:2px solid var(--card-border); overflow:hidden; height:calc(100vh - 300px); min-height:450px;"></div>
+        </section>
+
+        <!-- Tab 3: Vocabulary Wall -->
+        <section id="panel-vocab" class="tab-panel card">
+            <h2 class="card-title"><i class="fa-solid fa-book-open"></i> 自然文化台語詞彙牆</h2>
+            <div class="vocab-filter">
+                <button class="filter-btn active" id="btn-filter-all" onclick="filterVocab('all')">全部 All</button>
+                <button class="filter-btn" id="btn-filter-land" onclick="filterVocab('land')">陸地 Land</button>
+                <button class="filter-btn" id="btn-filter-water" onclick="filterVocab('water')">水域 Water</button>
+                <button class="filter-btn" id="btn-filter-nature" onclick="filterVocab('nature')">自然 Nature</button>
+                <button class="filter-btn" id="btn-filter-museum" onclick="filterVocab('museum')">博物館 Museum</button>
+                <button class="filter-btn" id="btn-filter-culture" onclick="filterVocab('culture')">文化 Culture</button>
+                <button class="filter-btn" id="btn-filter-place" onclick="filterVocab('place')">地點 Places</button>
+            </div>
+            
+            <div class="vocab-actions" style="margin-top: 5px; margin-bottom: 22px; display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                <!-- County Dropdown Filter -->
+                <select id="county-select" onchange="filterByCounty(this.value)" class="filter-btn" style="padding: 8px 16px; font-weight: 700; cursor: pointer; border-radius: 50px; background: var(--card-bg); color: var(--text); border: 2px solid var(--card-border); outline: none;">
+                    <option value="all">所有縣市 All Counties</option>
+                </select>
+
+                <button class="action-btn" onclick="exportVocab('json')" title="匯出為 JSON 檔案">
+                    <i class="fa-solid fa-file-code"></i> 匯出 JSON Export
+                </button>
+                <button class="action-btn" onclick="exportVocab('md')" title="匯出為 Markdown 檔案">
+                    <i class="fa-solid fa-file-markdown"></i> 匯出 Markdown Export
+                </button>
+            </div>
+
+            <!-- County Statistics Panel -->
+            <div id="county-stats-container" style="display: none; margin-bottom: 22px; padding: 16px 20px; background: var(--card-bg); border-radius: 18px; border: 2px solid var(--card-border);">
+                <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 12px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-chart-pie"></i> 縣市景點分佈統計 (County Statistics)
+                </h3>
+                <div id="county-stats-content" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+            </div>
+
+            <div class="vocab-grid" id="vocab-container"></div>
+        </section>
+
+        <!-- Tab 4: Quiz Challenge -->
+        <section id="panel-quiz" class="tab-panel card">
+            <h2 class="card-title"><i class="fa-solid fa-gamepad"></i> 台語聽力大挑戰</h2>
+
+            <div id="quiz-welcome" style="text-align: center; padding: 20px;">
+                <span style="font-size: 4rem; display: block; margin-bottom: 15px;">🎧</span>
+                <h3 style="font-size: 1.5rem; margin-bottom: 10px;">準備好接受台語大挑戰了嗎？</h3>
+                <p style="color: var(--text-light); margin-bottom: 25px; line-height: 1.6;">
+                    聆聽台語景點名稱的發音，在時限內選出正確的地點！<br>共 8 題，答對 6 題以上即為通過！
+                </p>
+                <button class="btn-cta" onclick="startQuiz()" style="max-width: 320px; margin: 0 auto;">
+                    <i class="fa-solid fa-play"></i> 開始挑戰
+                </button>
+            </div>
+
+            <div id="quiz-game" style="display: none;">
+                <div class="quiz-header">
+                    <span id="quiz-progress"><i class="fa-solid fa-circle-question"></i> 第 1 / 8 題</span>
+                    <span id="quiz-score" style="color: var(--orange-line);"><i class="fa-solid fa-star"></i> 分數: 0</span>
+                    <span id="quiz-timer" style="color: var(--primary);"><i class="fa-solid fa-hourglass-half"></i> 剩餘: 15s</span>
+                </div>
+                <div class="timer-bar-container"><div id="quiz-timer-bar" class="timer-bar"></div></div>
+                <div class="audio-box">
+                    <button class="btn-play-audio animate-pulse" onclick="playQuizAudio()" title="再聽一次"><i class="fa-solid fa-volume-high"></i></button>
+                </div>
+                <p class="quiz-question-txt">請點擊上方按鈕播放題目，並選出正確景點：</p>
+                <div class="quiz-options" id="quiz-options"></div>
+                <div class="quiz-feedback" id="quiz-feedback"></div>
+            </div>
+
+            <div id="quiz-result" style="display: none; text-align: center; padding: 20px;">
+                <span style="font-size: 3.5rem; display: block; margin-bottom: 10px;">🏆</span>
+                <h3 style="font-size: 1.8rem; color: var(--primary); margin-bottom: 8px;">挑戰結束！</h3>
+                <p id="quiz-final-score" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 22px;"></p>
+                <button class="btn-cta" onclick="resetQuiz()" style="max-width: 320px; margin: 0 auto;">
+                    <i class="fa-solid fa-rotate-left"></i> 再挑戰一次
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer>
+        <p>© 2026 景點博物館四界行 — 台灣景點台語互動教學網頁</p>
+        <p style="margin-top: 4px;">@史秀里冊房 Tō͘ Sìn-liông 製作</p>
+        <p style="margin-top: 4px; font-size: 0.72rem;">
+            語音引擎：中華民國教育部《臺灣閩南語常用詞辭典》真人發音（線上）/ Web Speech API 備援（離線）<br>
+            音訊來源感謝 <a href="https://github.com/ChhoeTaigi/KipSutianDataMirror" target="_blank" style="color: var(--primary);">ChhoeTaigi KipSutianDataMirror</a> 社群鏡像
+        </p>
+    </footer>
+
+    <script>
+// ===========================================================
+// 1. 台灣景點與博物館資料庫 (120 locations)
+// ===========================================================
+const locations = [
+    // --- 博物館 Museums ---
+    { id: 'npm', nameZH: '故宮', nameEN: 'National Palace Museum', pinyin: 'Kòo-kiong', type: 'Museum',
+      desc: 'This museum looks like a giant ancient palace! It is filled with thousands of old treasures, including a famous piece of jade that looks exactly like a delicious cabbage.',
+      vocab: '寶物 (pó-bu̍t) = Treasure', lat: 25.1025, lng: 121.5485, icon: '🏛️', county: '台北市' },
+    { id: 'nmns', nameZH: '科博館', nameEN: 'Science Museum', pinyin: 'Kho-phok-koán', type: 'Museum',
+      desc: 'The best place to learn about science and nature! They have giant moving dinosaur robots that roar, and a huge garden filled with beautiful butterflies and plants.',
+      vocab: '恐龍 (khióng-liông) = Dinosaur', lat: 24.1408, lng: 120.6836, icon: '🦖', county: '台中市' },
+    { id: 'nmmba', nameZH: '海生館', nameEN: 'Marine Biology Museum', pinyin: 'Hái-seng-koán', type: 'Museum',
+      desc: 'A giant aquarium down south where you can walk through underwater tunnels! You can see huge sharks, cute penguins, and beluga whales swimming right over your head.',
+      vocab: '鯊魚 (soa-hî) = Shark', lat: 21.9287, lng: 120.7459, icon: '🦈', county: '屏東縣' },
+    { id: 'chimei', nameZH: '奇美博物館', nameEN: 'Chimei Museum', pinyin: 'Kî-bí Phok-bu̍t-koán', type: 'Museum',
+      desc: 'The Chimei Museum looks like a European palace right in Taiwan! Inside, you can see incredible Western art, musical instruments from around the world, and even real suits of armor from medieval knights!',
+      vocab: '藝術 (gē-su̍t) = Art', lat: 22.9656, lng: 120.2258, icon: '🎨', county: '台南市' },
+    { id: 'ntm', nameZH: '臺灣博物館', nameEN: 'National Taiwan Museum', pinyin: 'Tâi-oân Phok-bu̍t-koán', type: 'Museum',
+      desc: 'The National Taiwan Museum is the oldest museum in all of Taiwan! It sits right in a beautiful park in Taipei. Inside, you can learn about Taiwan\'s animals, plants, and the people who lived here thousands of years ago!',
+      vocab: '博物館 (phok-bu̍t-koán) = Museum', lat: 25.0455, lng: 121.5179, icon: '🏛️', county: '台北市' },
+    { id: 'lanyang', nameZH: '蘭陽博物館', nameEN: 'Lanyang Museum', pinyin: 'Lân-iûnn Phok-bu̍t-koán', type: 'Museum',
+      desc: 'Located in Yilan, this museum is shaped like a giant rock rising out of the water! It teaches about Yilan\'s beautiful nature, wetlands, and the Kavalan indigenous people.',
+      vocab: '噶瑪蘭 (Kat-má-lân) = Kavalan', lat: 24.8617, lng: 121.8262, icon: '🏛️', county: '宜蘭縣' },
+    { id: 'nmp', nameZH: '史前館', nameEN: 'Museum of Prehistory', pinyin: 'Sú-tsîng-koán', type: 'Museum',
+      desc: 'Located in Taitung, this is the best place to learn about Taiwan\'s ancient people from thousands of years ago! It displays prehistoric jade ornaments, pottery, and stone tools.',
+      vocab: '史前 (sú-tsîng) = Prehistoric', lat: 22.7618, lng: 121.0906, icon: '🏺', county: '台東縣' },
+    { id: 'nstm', nameZH: '科工館', nameEN: 'Science & Technology Museum', pinyin: 'Kho-kang-koán', type: 'Museum',
+      desc: 'One of the largest science museums in Asia, located in Kaohsiung! It has hands-on exhibits about space, energy, robots, and how machines work.',
+      vocab: '工藝 (kang-gī) = Craft/Technology', lat: 22.6416, lng: 120.3236, icon: '🏗️', county: '高雄市' },
+    { id: 'ntmofa', nameZH: '國美館', nameEN: 'National Art Museum', pinyin: 'Kok-bí-koán', type: 'Museum',
+      desc: 'The only national art museum in Taiwan, located in Taichung! It features a huge outdoor sculpture park and galleries showcasing Taiwan\'s modern and contemporary artists.',
+      vocab: '美術 (bí-su̍t) = Fine Arts', lat: 24.1375, lng: 120.6639, icon: '🎨', county: '台中市' },
+    { id: 'nmmst', nameZH: '海科館', nameEN: 'Marine Science Museum', pinyin: 'Hái-kho-koán', type: 'Museum',
+      desc: 'Located in Keelung, this museum is built inside a former power plant! It features exhibits about deep-sea marine life, ocean ecology, and naval engineering.',
+      vocab: '科技 (kho-kī) = Technology', lat: 25.1368, lng: 121.7992, icon: '🚢', county: '基隆市' },
+    { id: 'sshang', nameZH: '十三行', nameEN: 'Shihsanhang Archaeology Museum', pinyin: 'Tsa̍p-sann-hâng', type: 'Museum',
+      desc: 'Built next to an ancient archaeological site in Bali, Taipei! It displays iron-smelting tools and the famous human-faced pottery jar from an iron-age culture 1,000 years ago.',
+      vocab: '考古 (khó-kóo) = Archaeology', lat: 25.1565, lng: 121.4053, icon: '🏺', county: '新北市' },
+    { id: 'gold', nameZH: '黃金博物館', nameEN: 'Gold Museum', pinyin: 'N̂g-kim Phok-bu̍t-koán', type: 'Museum',
+      desc: 'Located in the historic mining town of Jinguashi! You can touch a real 220kg bar of pure solid gold and explore the tunnels where miners dug for gold long ago.',
+      vocab: '黃金 (hông-kim) = Gold', lat: 25.1096, lng: 121.8601, icon: '🪙', county: '新北市' },
+    { id: 'tfam', nameZH: '北美館', nameEN: 'Taipei Fine Arts Museum', pinyin: 'Pak-bí-koán', type: 'Museum',
+      desc: 'Located in Taipei, this museum is famous for its tube-like architecture! It exhibits cutting-edge modern art, paintings, and sculptures by Taiwanese and international artists.',
+      vocab: '現代 (hiān-tāi) = Modern', lat: 25.0725, lng: 121.5248, icon: '🎨', county: '台北市' },
+    { id: 'kmfa', nameZH: '高美館', nameEN: 'Kaohsiung Museum of Fine Arts', pinyin: 'Ko-bí-koán', type: 'Museum',
+      desc: 'Located in a beautiful park in Kaohsiung! It exhibits modern art and displays a large collection of artworks by indigenous Taiwanese artists.',
+      vocab: '展覽 (tián-lám) = Exhibition', lat: 22.6582, lng: 120.2882, icon: '🖼️', county: '高雄市' },
+    { id: 'yingge', nameZH: '陶瓷博物館', nameEN: 'Yingge Ceramics Museum', pinyin: 'Ing-ko Tô-hûi Phok-bu̍t-koán', type: 'Museum',
+      desc: 'Located in Yingge, the pottery capital of Taiwan! It has a beautiful glass structure showcasing the history of clay, pottery wheels, and gorgeous ceramic artworks.',
+      vocab: '陶瓷 (tô-hûi) = Ceramics', lat: 24.9497, lng: 121.3533, icon: '🏺', county: '新北市' },
+    { id: 'zuojhen', nameZH: '左鎮化石園區', nameEN: 'Zuojhen Fossil Park', pinyin: 'Tsó-tìn Huà-tsio̍h Hn̂g-khu', type: 'Museum',
+      desc: 'This is the #1 place for fossils in Taiwan! Scientists found some of the oldest human remains in Taiwan here — called "Zuojhen Man." You can also see fossils of ancient rhinos, mammoths, saber-toothed tigers, and crocodiles that once roamed Taiwan!',
+      vocab: '化石 (huà-tsio̍h) = Fossil', lat: 23.0883, lng: 120.4044, icon: '🦣', county: '台南市' },
+    { id: 'nankeh', nameZH: '南科考古館', nameEN: 'Museum of Archaeology (Tainan)', pinyin: 'Lâm-kho Khó-kóo-koán', type: 'Museum',
+      desc: 'This is the best museum for Taiwan\'s Stone Age! It is built right on top of real archaeological sites. Kids can play in a mock dig pit, learn to make stone tools like ancient people did, and discover how people in Taiwan lived thousands and thousands of years ago!',
+      vocab: '石器 (chio̍h-khì) = Stone Tool', lat: 23.0725, lng: 120.2775, icon: '🪨', county: '台南市' },
+    { id: 'nmth', nameZH: '臺灣歷史博物館', nameEN: 'National Museum of Taiwan History', pinyin: 'Tâi-oân Li̍k-sú Phok-bu̍t-koán', type: 'Museum',
+      desc: 'A massive, world-class museum telling the WHOLE story of Taiwan! Walk through life-sized dioramas, see a historical sailing ship, and explore interactive displays that take you from prehistoric times all the way to the modern day. A must-see for the whole family!',
+      vocab: '歷史 (li̍k-sú) = History', lat: 23.0339, lng: 120.1742, icon: '🚢', county: '台南市' },
+    { id: 'nmtl', nameZH: '臺灣文學館', nameEN: 'National Museum of Taiwan Literature', pinyin: 'Tâi-oân Bûn-ha̍k Phok-bu̍t-koán', type: 'Museum',
+      desc: 'Housed in a beautiful building that is over 100 years old — once the grand Tainan Prefecture Hall! This museum keeps the stories and writings of Taiwan alive. They often have a special interactive reading room just for children.',
+      vocab: '文學 (bûn-ha̍k) = Literature', lat: 22.9972, lng: 120.2044, icon: '📚', county: '台南市' },
+    { id: 'ntsec', nameZH: '科教館', nameEN: 'Science Education Center', pinyin: 'Kho-kàu-koán', type: 'Museum',
+      desc: 'Located in Shilin, Taipei, this is a massive science learning center! It features multi-story science exhibits, a 3D theater, and hands-on physics, chemistry, and biology labs for all ages.',
+      vocab: '教育 (kàu-io̍k) = Education', lat: 25.0961, lng: 121.5165, icon: '🔬', county: '台北市' },
+    { id: 'mocataipei', nameZH: '當代藝術館', nameEN: 'Museum of Contemporary Art Taipei', pinyin: 'Tòng-tāi Gē-su̍t-koán', type: 'Museum',
+      desc: 'Housed in a beautiful brick building from the Japanese era that was once a school! It is Taiwan\'s first museum dedicated entirely to contemporary art, showing works by top modern artists.',
+      vocab: '當代 (tòng-tāi) = Contemporary', lat: 25.0494, lng: 121.5186, icon: '🏙️', county: '台北市' },
+    { id: 'postal', nameZH: '郵政博物館', nameEN: 'Postal Museum', pinyin: 'Iû-tsìng Phok-bu̍t-koán', type: 'Museum',
+      desc: 'A tall museum in Taipei completely about mail and stamps! You can see the history of how letters were sent long ago, stamps from all over the world, and even play as a postman delivering mail.',
+      vocab: '郵政 (iû-tsìng) = Postal Service', lat: 25.0298, lng: 121.5147, icon: '📮', county: '台北市' },
+    { id: 'history_museum', nameZH: '歷史博物館', nameEN: 'National Museum of History', pinyin: 'Sú-phok-koán', type: 'Museum',
+      desc: 'Located next to the beautiful Taipei Botanical Garden! This museum houses thousands of ancient Chinese bronzes, Tang dynasty tri-color pottery, and works of traditional calligraphy and painting.',
+      vocab: '歷史 (li̍k-sú) = History', lat: 25.0294, lng: 121.5108, icon: '🏺', county: '台北市' },
+    { id: 'pinglin', nameZH: '茶業博物館', nameEN: 'Pinglin Tea Museum', pinyin: 'Tê-gia̍p Phok-bu̍t-koán', type: 'Museum',
+      desc: 'Located in the tea-growing valley of Pinglin! It is one of the world\'s largest tea museums. You can learn how tea leaves are processed, participate in traditional tea ceremonies, and smell tea from around Taiwan.',
+      vocab: '茶業 (tê-gia̍p) = Tea Industry', lat: 24.9367, lng: 121.7133, icon: '🍵', county: '新北市' },
+    { id: 'ulay', nameZH: '泰雅博物館', nameEN: 'Ulay Atayal Museum', pinyin: 'Thài-ia Phok-bu̍t-koán', type: 'Museum',
+      desc: 'Located in the hot spring village of Wulai! This museum displays the rich cultural heritage, traditional hunting tools, weaving arts, and facial tattooing customs of the indigenous Atayal people.',
+      vocab: '泰雅 (Thài-ia) = Atayal', lat: 24.8633, lng: 121.5516, icon: '🏹', county: '新北市' },
+    { id: 'henghshan', nameZH: '橫山書法館', nameEN: 'Hengshan Calligraphy Art Center', pinyin: 'Hîng-san Su-huat-koán', type: 'Museum',
+      desc: 'A gorgeous architectural landmark in Taoyuan shaped like inkstones! It is the first public museum in Taiwan dedicated to calligraphy art, featuring ink wash paintings and writing exhibitions.',
+      vocab: '書法 (su-huat) = Calligraphy', lat: 25.0192, lng: 121.2052, icon: '🖌️', county: '桃園市' },
+    { id: 'daxi', nameZH: '大溪木藝館', nameEN: 'Daxi Wood Art Museum', pinyin: 'Tāi-khe Bo̍k-gī-koán', type: 'Museum',
+      desc: 'Composed of several historic wooden buildings in Daxi town! It showcases Daxi\'s famous traditional woodworking, fine furniture craftsmanship, and local religious folk customs.',
+      vocab: '木藝 (bo̍k-gī) = Wood Art', lat: 24.8856, lng: 121.2868, icon: '🪵', county: '桃園市' },
+    { id: 'glass_museum', nameZH: '玻璃工藝館', nameEN: 'Glass Crafts Museum', pinyin: 'Pō-lê Kang-gī-koán', type: 'Museum',
+      desc: 'Located inside Hsinchu Park! This museum celebrates Hsinchu\'s history as a glass-making center. You can see incredible, delicate glass sculptures and watch artists blow hot glass.',
+      vocab: '玻璃 (pō-lê) = Glass', lat: 24.8018, lng: 120.9782, icon: '🍺', county: '新竹市' },
+    { id: 'photo_museum', nameZH: '影像紀念館', nameEN: 'Deng Nan-guang Photo Museum', pinyin: 'Íng-siōng Kì-liām-koán', type: 'Museum',
+      desc: 'Located in Beipu, Hsinchu, inside a restored historic building! It commemorates Deng Nan-guang, one of Taiwan\'s photography pioneers. It displays vintage cameras and historic black-and-white photos of local life.',
+      vocab: '影像 (íng-siōng) = Image/Photo', lat: 24.6998, lng: 121.0583, icon: '📷', county: '新竹縣' },
+    { id: 'hakka_museum', nameZH: '客家文化館', nameEN: 'Taiwan Hakka Museum', pinyin: 'Kheh-ka Bûn-huà-koán', type: 'Museum',
+      desc: 'A massive modern museum on the hills of Miaoli! It features state-of-the-art exhibits about the global Hakka community, traditional architecture, foods like Lei-Cha, and beautiful tung blossom festivals.',
+      vocab: '客家 (Kheh-ka) = Hakka', lat: 24.4645, lng: 120.7725, icon: '🏮', county: '苗栗縣' },
+    { id: 'wood_museum', nameZH: '木雕博物館', nameEN: 'Sanyi Wood Sculpture Museum', pinyin: 'Bo̍k-tiau Phok-bu̍t-koán', type: 'Museum',
+      desc: 'The only museum in Taiwan dedicated entirely to wood sculpture, located in Sanyi, Miaoli! It showcases everything from traditional religious carvings to stunning contemporary abstract wood art.',
+      vocab: '木雕 (bo̍k-tiau) = Wood Carving', lat: 24.4055, lng: 120.7618, icon: '🪵', county: '苗栗縣' },
+    { id: 'glassland', nameZH: '台灣玻璃館', nameEN: 'Taiwan Glass Gallery', pinyin: 'Tâi-oân Pō-lê-koán', type: 'Museum',
+      desc: 'Located in Lugang, Changhua! It features the world\'s only glass temple, built with 70,000 pieces of glass. Inside, you can walk through a glass tunnel and see optical art displays.',
+      vocab: '玻璃 (pō-lê) = Glass', lat: 24.0682, lng: 120.3945, icon: '🍺', county: '彰化縣' },
+    { id: 'ctworld', nameZH: '中台世界博物館', nameEN: 'Chung Tai World Museum', pinyin: 'Tiong-tâi Sè-kài Phok-bu̍t-koán', type: 'Museum',
+      desc: 'A spectacular museum in Nantou styled like a Tang Dynasty fortress! It houses an incredible collection of ancient Buddhist statues, stone rubbings, and religious art from across Asia.',
+      vocab: '世界 (sè-kài) = World', lat: 24.0083, lng: 120.9416, icon: '🌐', county: '南投縣' },
+    { id: 'craft_museum', nameZH: '工藝園區', nameEN: 'Taiwan Craft Institute', pinyin: 'Kang-gī Hn̂g-khu', type: 'Museum',
+      desc: 'Located in Caotun, Nantou! A large park dedicated to traditional Taiwanese crafts. Visitors can watch master artisans work with bamboo, clay, metal, and indigo dye, and try making their own crafts.',
+      vocab: '工藝 (kang-gī) = Craft/Technology', lat: 23.9782, lng: 120.6865, icon: '🏗️', county: '南投縣' },
+    { id: 'puppet_museum', nameZH: '布袋戲館', nameEN: 'Yunlin Hand Puppet Museum', pinyin: 'Poo-tē-hì-koán', type: 'Museum',
+      desc: 'Housed in a beautiful brick courthouse from the Japanese era in Huwei, Yunlin! It displays historical hand puppets, colorful stage backdrops, and interactive puppet theaters.',
+      vocab: '布袋戲 (poo-tē-hì) = Puppet Show', lat: 23.7082, lng: 120.4326, icon: '🎭', county: '雲林縣' },
+    { id: 'npm_south', nameZH: '故宮南院', nameEN: 'Southern Branch of Palace Museum', pinyin: 'Kòo-kiong Lâm-īnn', type: 'Museum',
+      desc: 'An architectural masterpiece in Chiayi surrounded by artificial lakes! It exhibits masterpieces of Asian art, jade, imperial porcelain, and historical fabrics in vast, futuristic galleries.',
+      vocab: '南院 (Lâm-īnn) = Southern Branch', lat: 23.4716, lng: 120.2936, icon: '🏛️', county: '嘉義縣' },
+    { id: 'chiayi_art', nameZH: '嘉美館', nameEN: 'Chiayi Art Museum', pinyin: 'Ka-bí-koán', type: 'Museum',
+      desc: 'Built in Chiayi, combining a historic tobacco monopoly building with modern timber architecture! It features galleries exhibiting local Chiayi masters and cutting-edge modern artists.',
+      vocab: '藝術 (gē-su̍t) = Art', lat: 23.4776, lng: 120.4418, icon: '🎨', county: '嘉義市' },
+    { id: 'tnam_museum', nameZH: '美術館二館', nameEN: 'Tainan Art Museum', pinyin: 'Tâi-lâm Sī Bí-su̍t-koán', type: 'Museum',
+      desc: 'A jaw-dropping geometric structure in Tainan designed by a famous Japanese architect! The white roof is shaped like pentagonal structures mimicking forest canopies, casting beautiful sunbeams into the galleries.',
+      vocab: '美術 (bí-su̍t) = Fine Arts', lat: 22.9933, lng: 120.2027, icon: '🎨', county: '台南市' },
+    { id: 'kh_history', nameZH: '高史博', nameEN: 'Kaohsiung Museum of History', pinyin: 'Ko-hiông Li̍k-sú Phok-bu̍t-koán', type: 'Museum',
+      desc: 'Housed in the historic green-roofed Kaohsiung City Hall building! It displays old maps, models of early Kaohsiung harbor, and traces the growth of this maritime industrial city.',
+      vocab: '歷史 (li̍k-sú) = History', lat: 22.6282, lng: 120.2916, icon: '🏛️', county: '高雄市' },
+    { id: 'pingtung_1936', nameZH: '屏東菸廠', nameEN: 'Pingtung 1936 Shared Office', pinyin: 'Pîn-tong Iat-tshiánn', type: 'Museum',
+      desc: 'A massive industrial heritage site in Pingtung! It converts a Japanese-era tobacco factory into a museum. You can see giant processing machinery and learn about regional agriculture.',
+      vocab: '菸葉 (hun-hio̍h) = Tobacco Leaf', lat: 22.6616, lng: 120.5053, icon: '🍂', county: '屏東縣' },
+    { id: 'arts_center', nameZH: '傳藝中心', nameEN: 'National Traditional Arts Center', pinyin: 'Thoân-gē Tiong-sim', type: 'Museum',
+      desc: 'A giant park in Yilan built like a vintage Taiwanese town! Walk down brick streets to see live puppetry, old crafts, clay-forming, and eat traditional snacks.',
+      vocab: '傳統 (thoân-thóng) = Traditional', lat: 24.6933, lng: 121.8222, icon: '🏺', county: '宜蘭縣' },
+    { id: 'stone_museum', nameZH: '石雕博物館', nameEN: 'Hualien Stone Sculptures Museum', pinyin: 'Tsioh-tiau Phok-bu̍t-koán', type: 'Museum',
+      desc: 'Located by the seaside in Hualien! This is Taiwan\'s first stone sculpture museum, displaying giant, impressive marble and granite artworks carved by international masters.',
+      vocab: '石雕 (tsioh-tiau) = Stone Carving', lat: 23.9961, lng: 121.6282, icon: '🗿', county: '花蓮縣' },
+    { id: 'penghu_living', nameZH: '澎湖生博館', nameEN: 'Penghu Living Museum', pinyin: 'Phêⁿ-ôo Sing-ua̍h Phok-bu̍t-koán', type: 'Museum',
+      desc: 'Located in Magong, Penghu! This museum displays the unique island lifestyle, traditional fishing boats, windbreak walls, and the local religious festivals of the Penghu archipelago.',
+      vocab: '生活 (sing-ua̍h) = Life', lat: 23.5683, lng: 119.5753, icon: '🏡', county: '澎湖縣' },
+    { id: 'kinmen_folk', nameZH: '金門民俗館', nameEN: 'Kinmen Historical Folk Museum', pinyin: 'Kim-mn̂g Bîn-sio̍k-koán', type: 'Museum',
+      desc: 'Housed inside an old military fortress! It showcases Kinmen\'s unique history, traditional southern-Fujian style village layout, ancient clay artifacts, and how people lived during cross-strait conflicts.',
+      vocab: '民俗 (bîn-sio̍k) = Folk Custom', lat: 24.4485, lng: 118.4116, icon: '🏮', county: '金門縣' },
+    { id: 'matsu_folk', nameZH: '馬祖民俗館', nameEN: 'Matsu Folk Culture Museum', pinyin: 'Má-tsoo Bîn-sio̍k-koán', type: 'Museum',
+      desc: 'A gorgeous multi-story cultural museum overlooking the sea in Matsu! It displays historical artifacts, details on the local Min-dong dialect, fishing tools, and ship models from Matsu\'s island history.',
+      vocab: '民俗 (bîn-sio̍k) = Folk Custom', lat: 26.1556, lng: 119.9298, icon: '🏮', county: '連江縣' },
+
+    // --- 古蹟 Historic Sites (台南/高雄/屏東) ---
+    { id: 'chihkan', nameZH: '赤崁樓', nameEN: 'Chihkan Tower', pinyin: 'Tshiah-khám-lâu', type: 'Historic',
+      desc: 'Originally built by the Dutch in 1653 as Fort Provintia! This historic compound features elegant Chinese pavilions, turtle-carried stone steles, and beautiful gardens in the center of Tainan.',
+      vocab: '城 (siâⁿ) = Castle/Wall', lat: 22.9975, lng: 120.2026, icon: '🏯', county: '台南市' },
+    { id: 'confucian', nameZH: '孔廟', nameEN: 'Confucian Temple', pinyin: 'Khóng-biō', type: 'Historic',
+      desc: 'Built in 1665, the Tainan Confucian Temple is the oldest in Taiwan, known as the "First Academy of Taiwan." It features traditional red walls, grand banyan trees, and historical imperial plaques.',
+      vocab: '儒學 (jû-ha̍k) = Confucianism', lat: 22.9902, lng: 120.2028, icon: '📜', county: '台南市' },
+    { id: 'eternal', nameZH: '億載金城', nameEN: 'Eternal Golden Castle', pinyin: 'It-tāi-kim-siânn', type: 'Historic',
+      desc: 'A grand brick fortress built in 1876 to protect the coast! It features a water-filled moat, arched entry gates, and large historical Armstrong cannons on its grassy ramparts.',
+      vocab: '大砲 (tāi-phàu) = Cannon', lat: 22.9875, lng: 120.1585, icon: '💣', county: '台南市' },
+    { id: 'koxinga', nameZH: '延平郡王祠', nameEN: 'Koxinga Shrine', pinyin: 'Iân-pîng Kūn-ông-sû', type: 'Historic',
+      desc: 'Built in 1662 to honor Koxinga, who drove the Dutch from Taiwan! It is built in traditional southern-Chinese ancestral shrine style, featuring green gardens and historic bronze statues.',
+      vocab: '忠臣 (tiong-sîn) = Loyal Official', lat: 22.9882, lng: 120.2078, icon: '🛡️', county: '台南市' },
+    { id: 'fiveconcubines', nameZH: '五妃廟', nameEN: 'Five Concubines Temple', pinyin: 'Gōo-hui-biō', type: 'Historic',
+      desc: 'A quiet, elegant temple honoring the five royal concubines who remained loyal at the end of the Ming dynasty. It features a unique tomb-temple layout and a lovely green garden.',
+      vocab: '貞節 (tsing-tsiat) = Chastity/Loyalty', lat: 22.9806, lng: 120.2044, icon: '🌸', county: '台南市' },
+    { id: 'grandmatsu', nameZH: '大天后宮', nameEN: 'Grand Matsu Temple', pinyin: 'Tāi-thian-hōo-kiong', type: 'Historic',
+      desc: 'Taiwan\'s oldest official Matsu temple, once the palace of the last Ming dynasty prince! It features grand, detailed wood carvings, golden pillars, and a majestic statue of the sea goddess Matsu.',
+      vocab: '媽祖 (Má-tsoo) = Matsu', lat: 22.9968, lng: 120.2014, icon: '👵', county: '台南市' },
+    { id: 'war_temple', nameZH: '祀典武廟', nameEN: 'Official War Temple', pinyin: 'Sū-tián-bú-biō', type: 'Historic',
+      desc: 'Built in 1665 to honor Guan Yu, the God of War and Loyalty! It features a striking 66-meter-long red brick wall, high eaves, and detailed wood carvings inside.',
+      vocab: '關帝 (Kuan-tè) = Guandi/War God', lat: 22.9971, lng: 120.2018, icon: '🧔', county: '台南市' },
+    { id: 'hayashi', nameZH: '林百貨', nameEN: 'Hayashi Department Store', pinyin: 'Lîm Pah-huè', type: 'Historic',
+      desc: 'Opened in 1932 during the Japanese era as Tainan\'s first department store, complete with the city\'s first passenger elevator! Fully restored to showcase local crafts, coffee, and history.',
+      vocab: '百貨 (pah-huè) = Department Store', lat: 22.9918, lng: 120.2022, icon: '🛍️', county: '台南市' },
+    { id: 'foguanshan', nameZH: '佛光山', nameEN: 'Fo Guang Shan', pinyin: 'Hu̍t-kong-soaⁿ', type: 'Historic',
+      desc: 'A massive sacred Buddhist sanctuary in Kaohsiung! It features a spectacular path lined with tall pagodas leading up to a giant, majestic golden Buddha statue looking over the mountains.',
+      vocab: '菩薩 (Phôo-sat) = Bodhisattva', lat: 22.7485, lng: 120.4436, icon: '⛩️', county: '高雄市' },
+    { id: 'meinong', nameZH: '美濃客家庄', nameEN: 'Meinong Hakka Village', pinyin: 'Bí-nông', type: 'Historic',
+      desc: 'Meinong is a famous Hakka village nestled in Kaohsiung\'s green hills. It is world-renowned for traditional Hakka culture, delicious flat noodles (Ban-tiao), and gorgeous hand-painted paper umbrellas!',
+      vocab: '紙傘 (tsuá-suànn) = Paper Umbrella', lat: 22.8985, lng: 120.5364, icon: '☂️', county: '高雄市' },
+    { id: 'old_bridge', nameZH: '舊鐵橋', nameEN: 'Dashu Old Railway Bridge', pinyin: 'Tuā-tshiū Kū-thih-kiô', type: 'Historic',
+      desc: 'Built in 1913 during the Japanese era, this was once the longest railway bridge in Asia! Now it is a beautiful sky bridge walking path overlooking the wetlands and birds of the Gaoping River.',
+      vocab: '鐵橋 (thih-kiô) = Iron Bridge', lat: 22.6603, lng: 120.4358, icon: '🌉', county: '高雄市' },
+    { id: 'eluanbi', nameZH: '鵝鑾鼻燈塔', nameEN: 'Eluanbi Lighthouse', pinyin: 'Gô-lân-pī Teng-thah', type: 'Historic',
+      desc: 'The southernmost tip of Taiwan is home to Eluanbi! Its iconic white lighthouse was built in 1883 and is known as the "Light of East Asia," surrounded by a national park of coral rocks.',
+      vocab: '燈塔 (teng-thah) = Lighthouse', lat: 21.9022, lng: 120.8516, icon: '🗼', county: '屏東縣' },
+    { id: 'shengli', nameZH: '勝利星村', nameEN: 'Shengli Star Village', pinyin: 'Sìng-lī Tshing-tshuan', type: 'Historic',
+      desc: 'A gorgeous, historic neighborhood in Pingtung City! It features rows of renovated Japanese-era military officers\' houses, now filled with trendy bookstores, cafes, and local craft shops.',
+      vocab: '眷村 (kùn-tshuan) = Military Village', lat: 22.6739, lng: 120.4858, icon: '🏡', county: '屏東縣' },
+    { id: 'wanjin', nameZH: '萬金聖母聖殿', nameEN: 'Wanjin Catholic Sanctuary', pinyin: 'Bān-kim Sèng-tông', type: 'Historic',
+      desc: 'Built by Spanish missionaries in 1861, this is Taiwan\'s oldest standing Catholic church! Housed in a pristine white fortress-like building, it is a famous historic landmark.',
+      vocab: '教堂 (kàu-tn̂g) = Church', lat: 22.5978, lng: 120.6116, icon: '⛪', county: '屏東縣' },
+    { id: 'glass_bridge', nameZH: '山川琉璃吊橋', nameEN: 'Shanchuan Suspension Bridge', pinyin: 'San-tshuan Liû-lî Tiāu-kiô', type: 'Historic',
+      desc: 'A spectacular suspension bridge spanning across a deep river valley in Sandimen! Decorated with beautiful traditional indigenous glass beads, it offers breathtaking mountain views.',
+      vocab: '吊橋 (tiāu-kiô) = Suspension Bridge', lat: 22.7164, lng: 120.6482, icon: '🌉', county: '屏東縣' },
+
+    // --- 自然與地質 Nature & Geography ---
+    { id: 'yehliu', nameZH: '野柳', nameEN: 'Yehliu Geopark', pinyin: 'Iá-liú', type: 'Coast',
+      desc: 'Yehliu is by the ocean and has amazing rocks shaped by the wind and water. The most famous one looks exactly like a Queen\'s head!',
+      vocab: '石頭 (chio̍h-thâu) = Stone', lat: 25.2074, lng: 121.6903, icon: '🗿', county: '新北市' },
+    { id: 'yangming', nameZH: '陽明山', nameEN: 'Yangmingshan', pinyin: 'Iûnn-bîng-soaⁿ', type: 'Volcano',
+      desc: 'Right next to the big city of Taipei is a mountain full of sleeping volcanoes! Because the ground underneath is still warm, the water bubbles up into hot springs.',
+      vocab: '溫泉 (un-tsuân) = Hot Spring', lat: 25.1634, lng: 121.5554, icon: '🌋', county: '台北市' },
+    { id: 'taroko', nameZH: '太魯閣', nameEN: 'Taroko Gorge', pinyin: 'Thài-lóo-koh', type: 'Canyon',
+      desc: 'Over millions of years, a fast river cut right through solid marble rocks to create this giant canyon. The walls are so tall and made of beautiful, smooth stone.',
+      vocab: '峽谷 (kiap-kok) = Canyon', lat: 24.1588, lng: 121.6294, icon: '🪨', county: '花蓮縣' },
+    { id: 'qingshui', nameZH: '清水斷崖', nameEN: 'Qingshui Cliff', pinyin: 'Chheng-chúi Toān-gâi', type: 'Cliff',
+      desc: 'The Qingshui Cliff is one of the most breathtaking sights in Taiwan! Giant marble cliffs drop straight down over 1,000 meters into the deep blue Pacific Ocean.',
+      vocab: '斷崖 (toān-gâi) = Cliff', lat: 24.2508, lng: 121.6228, icon: '🏔️', county: '花蓮縣' },
+    { id: 'sunmoon', nameZH: '日月潭', nameEN: 'Sun Moon Lake', pinyin: 'Ji̍t-goa̍t-thâm', type: 'Lake',
+      desc: 'This is the largest body of water right in the middle of Taiwan. A long time ago, people thought the east side looked round like the Sun, and the west side looked curved like a crescent Moon!',
+      vocab: '潭 (thâm) = Deep Lake', lat: 23.8608, lng: 120.9176, icon: '💧', county: '南投縣' },
+    { id: 'zhuoshui', nameZH: '濁水溪', nameEN: 'Zhuoshui River', pinyin: 'Lô-chúi-khe', type: 'River',
+      desc: 'This is the longest river in Taiwan. The name actually means "muddy water" because it carries lots of Central Mountain soil down to the sea.',
+      vocab: '溪 (khe) = River', lat: 23.8800, lng: 120.4800, icon: '🏞️', county: '彰化縣' },
+    { id: 'yushan', nameZH: '玉山', nameEN: 'Jade Mountain', pinyin: 'Gio̍k-soaⁿ', type: 'Mountain',
+      desc: 'Jade Mountain is the tallest mountain in all of Taiwan! It is so high up that if you climb to the very top in the winter, you will find beautiful, freezing white snow.',
+      vocab: '山 (soaⁿ) = Mountain', lat: 23.4706, lng: 120.9572, icon: '⛰️', county: '南投縣' },
+    { id: 'alishan', nameZH: '阿里山', nameEN: 'Alishan', pinyin: 'A-lí-soaⁿ', type: 'Forest',
+      desc: 'Alishan is famous for giant trees that are thousands of years old! You can ride a cool little red train up the mountain right through the thick, magical fog.',
+      vocab: '樹仔 (chhiū-á) = Tree', lat: 23.5117, lng: 120.8038, icon: '🌲', county: '嘉義縣' },
+    { id: 'gaomei', nameZH: '高美濕地', nameEN: 'Gaomei Wetlands', pinyin: 'Ko-bí Si̍p-tē', type: 'Wetland',
+      desc: 'Gaomei Wetlands is a magical place where land meets sea. At sunset, the shallow water reflects the sky like a giant mirror! Hundreds of birds and tiny crabs live here.',
+      vocab: '濕地 (si̍p-tē) = Wetland', lat: 24.3178, lng: 120.5388, icon: '🦀', county: '台中市' },
+    { id: 'shifen', nameZH: '十分瀑布', nameEN: 'Shifen Waterfall', pinyin: 'Si̍p-hun Pha̍k-poo', type: 'Waterfall',
+      desc: 'Shifen Waterfall is the widest waterfall in Taiwan! It looks like a mini Niagara Falls. Nearby, people love to write wishes on paper sky lanterns and release them into the sky!',
+      vocab: '瀑布 (pha̍k-poo) = Waterfall', lat: 25.0437, lng: 121.7783, icon: '🌊', county: '新北市' },
+    { id: 'loveriver', nameZH: '愛河', nameEN: 'Love River', pinyin: 'Ài-hô', type: 'River',
+      desc: 'A famous, beautiful river that flows right through Kaohsiung city. At night, it lights up with colorful lights, and you can ride boats on it!',
+      vocab: '河 (hô) = River/Canal', lat: 22.6314, lng: 120.2889, icon: '🛥️', county: '高雄市' },
+    { id: 'kenting', nameZH: '墾丁', nameEN: 'Kenting', pinyin: 'Khún-teng', type: 'Beach',
+      desc: 'Way down at the very bottom of Taiwan is Kenting! It is almost always sunny here. It has beautiful white sand beaches, coral reefs, and bright blue ocean water.',
+      vocab: '海 (hái) = Sea', lat: 21.9471, lng: 120.8015, icon: '🏖️', county: '屏東縣' },
+    { id: 'liantitham', nameZH: '蓮池潭', nameEN: 'Lotus Pond', pinyin: 'Liân-tî-thâm', type: 'Coast',
+      desc: 'A gorgeous lake in northern Kaohsiung famous for its Dragon and Tiger Pagodas! Walk into the dragon\'s mouth and out the tiger\'s mouth for good luck, surrounded by lotus flowers.',
+      vocab: '塔 (thah) = Pagoda/Tower', lat: 22.6806, lng: 120.2925, icon: '🛕', county: '高雄市' },
+    { id: 'sizihwan', nameZH: '西子灣', nameEN: 'Sizihwan', pinyin: 'Se-tsú-uân', type: 'Beach',
+      desc: 'Located by the Kaohsiung harbor entrance! It has beautiful black sand beaches, romantic coastal lookouts, and is world-famous for its majestic orange sunsets.',
+      vocab: '夕陽 (si̍k-iông) = Sunset', lat: 22.6224, lng: 120.2644, icon: '🌅', county: '高雄市' },
+    { id: 'dapengbay', nameZH: '大鵬灣', nameEN: 'Dapeng Bay', pinyin: 'Tāi-phîng-uân', type: 'Coast',
+      desc: 'A giant lagoon in southwestern Pingtung! It features sailing, windsurfing, rich mangrove wetlands, and a spectacular sea-crossing bridge that opens up to let yachts pass.',
+      vocab: '帆船 (phân-tsûn) = Sailboat', lat: 22.4582, lng: 120.4694, icon: '⛵', county: '屏東縣' },
+    { id: 'sichongxi', nameZH: '四重溪溫泉', nameEN: 'Sichongxi Hot Spring', pinyin: 'Sù-tiông-khe', type: 'Volcano',
+      desc: 'Four streams wind through these southern hills where warm mineral waters bubble up. It is one of Taiwan\'s four historic Japanese-era hot spring bath towns.',
+      vocab: '溫泉 (un-tsuân) = Hot Spring', lat: 22.0917, lng: 120.7418, icon: '♨️', county: '屏東縣' },
+    { id: 'shuangliu', nameZH: '雙流森林', nameEN: 'Shuangliu Forest', pinyin: 'Siang-lîu Sîng-lîm', type: 'Forest',
+      desc: 'A lush tropical forest valley where two streams join together! It features hanging banyan trees, rare butterflies, and hiking trails leading to a gorgeous, rushing waterfall.',
+      vocab: '芬多精 (hun-to-tsing) = Phytoncide', lat: 22.2108, lng: 120.7936, icon: '🌲', county: '屏東縣' },
+
+    // --- 離島 Islands ---
+    { id: 'guishan', nameZH: '龜山島', nameEN: 'Guishan Island', pinyin: 'Ku-soaⁿ-tó', type: 'Island',
+      desc: 'If you look out into the ocean from Yilan, you will see an island that looks exactly like a giant sea turtle swimming in the water! Dolphins and whales love to swim around this turtle island.',
+      vocab: '龜 (ku) = Turtle', lat: 24.8484, lng: 121.9285, icon: '🐢', county: '宜蘭縣' },
+    { id: 'penghu', nameZH: '澎湖', nameEN: 'Penghu', pinyin: 'Phêⁿ-ôo', type: 'Archipelago',
+      desc: 'Penghu isn\'t just one place; it\'s a group of 90 little islands sitting out in the ocean! The wind blows very hard there, and they have amazing rocks that look like giant stone pillars.',
+      vocab: '島 (tó) = Island', lat: 23.5711, lng: 119.5794, icon: '🏝️', county: '澎湖縣' },
+    { id: 'lanyu', nameZH: '蘭嶼', nameEN: 'Orchid Island', pinyin: 'Lân-sū', type: 'Island',
+      desc: 'A beautiful island southeast of Taiwan! People here have traditional underground houses and catch special flying fish that leap out of the ocean.',
+      vocab: '魚 (hî) = Fish', lat: 22.0518, lng: 121.5503, icon: '🐟', county: '台東縣' },
+    { id: 'greenisland', nameZH: '綠島', nameEN: 'Green Island', pinyin: 'Li̍k-tó', type: 'Island',
+      desc: 'Green Island is a small tropical island off the east coast of Taiwan. It has one of the few saltwater hot springs in the world! You can snorkel in crystal-clear water and see colorful coral reefs!',
+      vocab: '珊瑚 (san-hôo) = Coral', lat: 22.6684, lng: 121.4880, icon: '🪸', county: '台東縣' },
+    { id: 'liuqiu', nameZH: '小琉球', nameEN: 'Xiaoliuqiu', pinyin: 'Sió-liû-kiû', type: 'Island',
+      desc: 'Little Liuqiu is a tiny coral island off the southwest coast. It is the best place in Taiwan to see wild sea turtles! The water is so clear that you can see the turtles swimming below you!',
+      vocab: '海龜 (hái-ku) = Sea Turtle', lat: 22.3461, lng: 120.3726, icon: '🐢', county: '屏東縣' },
+    { id: 'cijin', nameZH: '旗津', nameEN: 'Cijin Island', pinyin: 'Kî-tin', type: 'Island',
+      desc: 'A long, narrow island in Kaohsiung harbor reached by a fun ferry ride! Famous for fresh seafood, old brick fortresses, a black sand beach, and a historic white lighthouse on the cliff.',
+      vocab: '渡輪 (tōo-lûn) = Ferry', lat: 22.6133, lng: 120.2694, icon: '⛴️', county: '高雄市' },
+    { id: 'shoushan', nameZH: '壽山', nameEN: 'Shoushan', pinyin: 'Siū-soaⁿ', type: 'Mountain',
+      desc: 'Shoushan is a famous mountain overlooking Kaohsiung city! It is known as Monkey Mountain because hundreds of wild Formosan rock macaques live here. You can hike the wooden paths and see monkeys playing in the trees.',
+      vocab: '猴 (kâu) = Monkey', lat: 22.6468, lng: 120.2718, icon: '🐒', county: '高雄市' },
+    { id: 'weiwuying', nameZH: '衛武營', nameEN: 'Weiwuying Center for the Arts', pinyin: 'Uē-bú-înn', type: 'Art',
+      desc: 'A spectacular modern arts center in Kaohsiung! Designed like a group of huge, waving banyan trees with a single giant canopy. It houses world-class concert halls and an outdoor theater under the roof.',
+      vocab: '歌劇 (koa-ke̍k) = Opera', lat: 22.6225, lng: 120.3418, icon: '🎭', county: '高雄市' },
+    { id: 'sugar_factory', nameZH: '糖廠', nameEN: 'Ciaotou Sugar Refinery', pinyin: 'Kiâu-thâu Thn̂g-tshióng', type: 'Historic',
+      desc: 'Taiwan\'s very first modern sugar factory, built in 1901 in Ciaotou! You can walk among historic red brick offices, explore giant sugar-crushing machinery, and ride a vintage steam train.',
+      vocab: '甘蔗 (kam-tsià) = Sugarcane', lat: 22.7582, lng: 120.3116, icon: '🎋', county: '高雄市' },
+
+    // --- 老街/古蹟/藝文 Culture & History ---
+    { id: 'jiufen', nameZH: '九份', nameEN: 'Jiufen Old Street', pinyin: 'Káu-hūn', type: 'Old Street',
+      desc: 'Jiufen is a charming mountain village with narrow, winding alleys full of red lanterns! The streets are packed with tea houses and yummy local snacks. It looks just like a scene from a famous animated movie!',
+      vocab: '老街 (lāu-ke) = Old Street', lat: 25.1093, lng: 121.8442, icon: '🏮', county: '新北市' },
+    { id: 'tamsui', nameZH: '淡水', nameEN: 'Tamsui', pinyin: 'Tām-chúi', type: 'Historical',
+      desc: 'Tamsui is a beautiful old port town right by the river mouth. You can walk along the waterfront, eat iron eggs and fish crackers, and watch the most amazing golden sunsets over the ocean!',
+      vocab: '夕陽 (si̍k-iông) = Sunset', lat: 25.1703, lng: 121.4413, icon: '🌅', county: '新北市' },
+    { id: 'anping', nameZH: '安平古堡', nameEN: 'Anping Fort', pinyin: 'An-pêng Kóo-pó', type: 'Historic',
+      desc: 'Anping Fort is one of the oldest buildings in Taiwan! It was built hundreds of years ago by Dutch traders. From the top of the old watchtower, you can see the whole city of Tainan!',
+      vocab: '古堡 (kóo-pó) = Old Fort', lat: 22.9931, lng: 120.1607, icon: '🏰', county: '台南市' },
+    { id: 'pier2', nameZH: '駁二藝術特區', nameEN: 'Pier-2 Art Center', pinyin: 'Phak-jī Gē-su̍t Ti̍k-khu', type: 'Art',
+      desc: 'Pier-2 is a super cool art district in old warehouses by the Kaohsiung harbor! You can see giant robot statues, colorful street art, and ride a tiny train. There are creative exhibitions and fun shops everywhere!',
+      vocab: '藝術 (gē-su̍t) = Art', lat: 22.6191, lng: 120.2801, icon: '🤖', county: '高雄市' },
+    { id: 'kmc', nameZH: '高流', nameEN: 'Music Center', pinyin: 'Ko-hiông Liû-hîng Im-gia̍k Tiong-sim', type: 'Art',
+      desc: 'The Kaohsiung Music Center is a stunning landmark on the harbor! Its futuristic white architecture is shaped like ocean waves and coral. It is the heart of live concerts and music festivals.',
+      vocab: '歌 (kua) = Song', lat: 22.6208, lng: 120.2936, icon: '🎵', county: '高雄市' },
+
+    // --- 全台二二八紀念公園與紀念碑 (228 Memorial Parks & Monuments) ---
+    { id: '228_keelung_zhongzheng', nameZH: '基隆二二八紀念碑', nameEN: 'Keelung 228 Memorial Monument', pinyin: 'Ki-liông Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Located on the hill of Zhongzheng Park overlooking Keelung Port. Erected in 1995 to commemorate victims of the 1947 tragedy in Keelung.',
+      vocab: '和平 (hô-pîng) = Peace', lat: 25.1325, lng: 121.7516, icon: '🕊️', county: '基隆市' },
+    { id: '228_keelung_badu', nameZH: '八堵站二二八紀念碑', nameEN: 'Badu Station 228 Railway Workers Monument', pinyin: 'Pat-tóo-tsām Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Built in 1994 next to Badu Railway Station to honor the courageous stationmaster and railway employees who perished during the 228 Incident.',
+      vocab: '勇氣 (ióng-khì) = Courage', lat: 25.1086, lng: 121.7289, icon: '🕊️', county: '基隆市' },
+    { id: '228_taipei_central', nameZH: '中央二二八紀念碑', nameEN: 'National 228 Memorial Monument (Taipei)', pinyin: 'Tiong-ng Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'The towering national central memorial designed by Cheng Tzu-li, standing in the heart of 228 Peace Memorial Park near Taipei Main Station.',
+      vocab: '紀念 (kì-liām) = Commemorate', lat: 25.0411, lng: 121.5158, icon: '🕊️', county: '台北市' },
+    { id: '228_taipei_spark', nameZH: '二二八引爆地紀念碑', nameEN: '228 Incident Spark Site Monument', pinyin: 'Jī-jī-pat Ín-po̍k-tē Kì-liām-pi', type: 'Memorial',
+      desc: 'Marking the historic origin spot on Nanjing West Road near the former Tianma Tea House where the initial confrontation occurred on Feb 27, 1947.',
+      vocab: '歷史 (li̍k-sú) = History', lat: 25.0535, lng: 121.5113, icon: '🕊️', county: '台北市' },
+    { id: '228_sanchong', nameZH: '三重二二八紀念公園', nameEN: 'Sanchong 228 Peace Memorial Park', pinyin: 'Sam-tîng Jī-jī-pat Kong-hn̂g', type: 'Memorial',
+      desc: 'A peaceful municipal memorial park and monument opened in 2002 in Sanchong, featuring green open spaces and memorial sculptures.',
+      vocab: '民主 (bîn-tsú) = Democracy', lat: 25.0682, lng: 121.4932, icon: '🕊️', county: '新北市' },
+    { id: '228_tamsui_puding', nameZH: '淡水埔頂二二八紀念碑', nameEN: 'Tamsui Puding 228 Memorial Monument', pinyin: 'Phu-tíng Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Set inside the historic campus of Tamkang High School in Tamsui, honoring Principal Chen Neng-tong and teachers who lost their lives.',
+      vocab: '教育 (kàu-io̍k) = Education', lat: 25.1764, lng: 121.4396, icon: '🕊️', county: '新北市' },
+    { id: '228_taoyuan_luzhu', nameZH: '桃園二二八紀念公園', nameEN: 'Taoyuan 228 Memorial Park (Luzhu)', pinyin: 'Thô-hn̂g Jī-jī-pat Kong-hn̂g', type: 'Memorial',
+      desc: 'Located in Luzhu District, Taoyuan. Features an impressive soaring memorial tower, reflecting pond, and human rights educational plaza.',
+      vocab: '自由 (tsū-iû) = Freedom', lat: 25.0483, lng: 121.2891, icon: '🕊️', county: '桃園市' },
+    { id: '228_hsinchu_moat', nameZH: '新竹市二二八紀念碑', nameEN: 'Hsinchu City 228 Memorial Monument', pinyin: 'Sin-tik-tshī Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Built in 2001 in the serene Moat Riverside Park near Hsinchu Train Station, designed as a tear of peace embracing the flowing water.',
+      vocab: '人權 (jîn-khoân) = Human Rights', lat: 24.8046, lng: 120.9712, icon: '🕊️', county: '新竹市' },
+    { id: '228_taichung_dongfeng', nameZH: '臺中市東峰二二八紀念碑', nameEN: 'Taichung Dongfeng 228 Monument', pinyin: 'Tâi-tiong Tang-hong Kì-liām-pi', type: 'Memorial',
+      desc: 'Erected in 1995 in Dongfeng Park in East District, Taichung, featuring a landmark monument symbolizing eternal peace and civic unity.',
+      vocab: '團結 (thoân-kiat) = Solidarity', lat: 24.1256, lng: 120.6908, icon: '🕊️', county: '台中市' },
+    { id: '228_taichung_dali', nameZH: '大里二二八紀念碑', nameEN: 'Taichung Dali 228 Memorial Monument', pinyin: 'Tāi-lí Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Located in Guoguang Park in Dali District, built in 2001 by the former Taichung County Government with a peaceful garden layout.',
+      vocab: '公義 (kong-gī) = Justice', lat: 24.1132, lng: 120.6815, icon: '🕊️', county: '台中市' },
+    { id: '228_taichung_pu', nameZH: '靜宜大學二二八紀念碑', nameEN: 'Providence University 228 Monument', pinyin: 'Tsīng-gî Tāi-ha̍k Kì-liām-pi', type: 'Memorial',
+      desc: 'The first 228 memorial established inside a university campus in Taiwan (2001), inspiring students to cherish human rights and truth.',
+      vocab: '校園 (hāu-hn̂g) = Campus', lat: 24.2268, lng: 120.5796, icon: '🕊️', county: '台中市' },
+    { id: '228_changhua_lib', nameZH: '彰化縣二二八紀念碑', nameEN: 'Changhua County 228 Monument', pinyin: 'Tsiong-huà Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Dedicated in 2022 in front of Changhua County Library, designed as an elegant horizontal ground-level landscape monument.',
+      vocab: '包容 (pau-iông) = Tolerance', lat: 24.0782, lng: 120.5486, icon: '🕊️', county: '彰化縣' },
+    { id: '228_nantou_wuniulan', nameZH: '烏牛欄戰役紀念碑', nameEN: 'Wuniulan Battle 228 Monument', pinyin: 'Oo-gû-lân Tsiàn-e̍k Kì-liām-pi', type: 'Memorial',
+      desc: 'Located at Ailan Bridge in Puli, commemorating the historic 27 Brigade\'s brave final defensive engagement in March 1947.',
+      vocab: '守護 (siú-hōo) = Protect/Defend', lat: 23.9616, lng: 120.9468, icon: '🕊️', county: '南投縣' },
+    { id: '228_nantou_zhushan', nameZH: '竹山二二八紀念碑', nameEN: 'Zhushan 228 Memorial Monument', pinyin: 'Tik-soaⁿ Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Erected in Zhushan Park, South Nantou, commemorating local civilian victims and reminding future generations to maintain peace.',
+      vocab: '鄉土 (hiong-thóo) = Homeland', lat: 23.7578, lng: 120.6836, icon: '🕊️', county: '南投縣' },
+    { id: '228_yunlin_gukeng_old', nameZH: '古坑二二八紀念碑', nameEN: 'Gukeng 228 Memorial Monument', pinyin: 'Kóo-kheⁿ Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Taiwan\'s first 228 memorial monument constructed directly on an archaeological victim excavation site in Gukeng in 2000.',
+      vocab: '真相 (tsin-siòng) = Truth', lat: 23.6428, lng: 120.5622, icon: '🕊️', county: '雲林縣' },
+    { id: '228_yunlin_county', nameZH: '雲林縣二二八紀念碑', nameEN: 'Yunlin County 228 Memorial Monument', pinyin: 'Hûn-lîm-koān Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'A comprehensive memorial park and monument opened in 2007 in Gukeng with wider ceremonial gathering spaces and peace bells.',
+      vocab: '撫平 (hú-pîng) = Healing', lat: 23.6398, lng: 120.5582, icon: '🕊️', county: '雲林縣' },
+    { id: '228_chiayi_mido_first', nameZH: '嘉義市二二八紀念碑', nameEN: 'Chiayi City 228 Monument (First in Taiwan)', pinyin: 'Ka-gī-tshī Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'The very first 228 memorial monument in Taiwan, courageously erected in 1989 near Mituo Road and relocated to Chiayi 228 Memorial Park.',
+      vocab: '開創 (khai-tshòng) = Pioneering', lat: 23.4728, lng: 120.4682, icon: '🕊️', county: '嘉義市' },
+    { id: '228_chiayi_park_new', nameZH: '嘉義市二二八紀念公園碑', nameEN: 'Chiayi 228 Memorial Park Monument', pinyin: 'Ka-gī Jī-jī-pat Kong-hn̂g-pi', type: 'Memorial',
+      desc: 'Located in Chiayi 228 Memorial Park in East District (1996), featuring an underground exhibition hall, bell tower, and landscaped ponds.',
+      vocab: '省思 (síng-su) = Reflection', lat: 23.4735, lng: 120.4705, icon: '🕊️', county: '嘉義市' },
+    { id: '228_chiayi_national', nameZH: '嘉義二二八國家紀念公園', nameEN: 'Chiayi 228 National Memorial Park', pinyin: 'Ka-gī Kok-ka Jī-jī-pat Kong-hn̂g', type: 'Memorial',
+      desc: 'A vast national park established in 2001 in West District, Chiayi, featuring a striking modern memorial sculpture and expansive peaceful wetlands.',
+      vocab: '國家 (kok-ka) = Nation', lat: 23.4685, lng: 120.4218, icon: '🕊️', county: '嘉義市' },
+    { id: '228_chiayi_alishan', nameZH: '阿里山二二八紀念碑', nameEN: 'Alishan 228 Indigenous Memorial', pinyin: 'A-lí-soaⁿ Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Set high in the Tapang Tsou indigenous village in Alishan, remembering Tsou leaders Uyongu Yatauyungana and victims of the conflict.',
+      vocab: '原住民族 (goân-tsū-bîn) = Indigenous', lat: 23.4542, lng: 120.7516, icon: '🕊️', county: '嘉義縣' },
+    { id: '228_tainan_anping', nameZH: '臺南市二二八紀念公園', nameEN: 'Tainan City 228 Memorial Park (Anping)', pinyin: 'Tâi-lâm-tshī Jī-jī-pat Kong-hn̂g', type: 'Memorial',
+      desc: 'Located across from Tainan City Hall in Anping District, featuring a soaring spire sculpture and solemn memorial waterscape.',
+      vocab: '撫慰 (hú-uì) = Consolation', lat: 22.9912, lng: 120.1852, icon: '🕊️', county: '台南市' },
+    { id: '228_tainan_xinying', nameZH: '新營二二八紀念碑', nameEN: 'Xinying 228 Memorial Monument', pinyin: 'Sin-iânn Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Located at the County Stadium in Xinying, erected in 1996 to honor victims from the northern plains of Tainan.',
+      vocab: '光明 (kong-bîng) = Brightness', lat: 23.3105, lng: 120.3082, icon: '🕊️', county: '台南市' },
+    { id: '228_kaohsiung_gangshan', nameZH: '岡山二二八和平紀念碑', nameEN: 'Gangshan 228 Peace Monument', pinyin: 'Kong-san Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Erected in 1993 in Gangshan Peace Park, one of the earliest official district memorial monuments in Kaohsiung.',
+      vocab: '慈愛 (tsû-ài) = Lovingkindness', lat: 22.7915, lng: 120.2912, icon: '🕊️', county: '高雄市' },
+    { id: '228_kaohsiung_shoushan', nameZH: '壽山二二八和平紀念碑', nameEN: 'Shoushan 228 Peace Monument', pinyin: 'Siū-soaⁿ Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Set upon the forested ridge of Shoushan overlooking the Kaohsiung cityscape, dedicated in 1993 to remember the historic fortress negotiations.',
+      vocab: '誓言 (sè-giân) = Vow/Oath', lat: 22.6395, lng: 120.2748, icon: '🕊️', county: '高雄市' },
+    { id: '228_kaohsiung_yancheng', nameZH: '高雄市二二八和平紀念公園', nameEN: 'Kaohsiung 228 Peace Memorial Park', pinyin: 'Ko-hiông Jī-jī-pat Kong-hn̂g', type: 'Memorial',
+      desc: 'Located by the Love River on Zhongzheng 4th Road in Yancheng District (formerly Renai Park). Dedicated in 2006 with inscribed victim names.',
+      vocab: '人權 (jîn-khoân) = Human Rights', lat: 22.6282, lng: 120.2882, icon: '🕊️', county: '高雄市' },
+    { id: '228_pingtung_park', nameZH: '屏東公園二二八紀念碑', nameEN: 'Pingtung Park 228 Memorial Monument', pinyin: 'Pîn-tong Kong-hn̂g Kì-liām-pi', type: 'Memorial',
+      desc: 'Erected in 1992 in historic Pingtung Park, shaped like a sheltering tent of hope symbolizing mutual ethnic respect and peace.',
+      vocab: '希望 (hi-bāng) = Hope', lat: 22.6765, lng: 120.4912, icon: '🕊️', county: '屏東縣' },
+    { id: '228_pingtung_linbian', nameZH: '林邊二二八紀念碑', nameEN: 'Linbian 228 Memorial Monument', pinyin: 'Nâ-piⁿ Jī-jī-pat Kì-liām-pi', type: 'Memorial',
+      desc: 'Established in 1994 in Linbian Riverside Park, dedicated to local martyrs and villagers who suffered during the tragedy.',
+      vocab: '平撫 (pîng-hú) = Consolation', lat: 22.4338, lng: 120.5126, icon: '🕊️', county: '屏東縣' },
+    { id: '228_yilan_clear_mirror', nameZH: '宜蘭二二八紀念物', nameEN: 'Yilan 228 Memorial (Mirror of History)', pinyin: 'Gî-lân Jī-jī-pat Kì-liām-bu̍t', type: 'Memorial',
+      desc: 'Known as \'The Mirror of History\' (歷史之澄鏡), designed in 2004 inside Yilan Sports Park as an underground reflective sanctuary of quiet contemplation.',
+      vocab: '澄鏡 (tîng-kiànn) = Clear Mirror', lat: 24.7412, lng: 121.7582, icon: '🕊️', county: '宜蘭縣' },
+    { id: '228_hualien_beibin', nameZH: '花蓮關懷二二八紀念碑', nameEN: 'Hualien 228 Caring Peace Monument', pinyin: 'Hua-liân Koan-hoâi Kì-liām-pi', type: 'Memorial',
+      desc: 'Dedicated in 1996 in Peace Plaza at Beibin Park, facing the Pacific Ocean with outstretched hands offering eternal reconciliation.',
+      vocab: '關懷 (koan-hoâi) = Caring', lat: 23.9782, lng: 121.6162, icon: '🕊️', county: '花蓮縣' },
+];
+
+// ===========================================================
+// 2. 詞彙庫 (91 vocabulary items)
+// ===========================================================
+const vocabData = [
+    { zh: "山", tw: "soaⁿ", en: "Mountain", emoji: "⛰️", type: "land" },
+    { zh: "溪", tw: "khe", en: "River/Creek", emoji: "🏞️", type: "water" },
+    { zh: "河", tw: "hô", en: "River/Canal", emoji: "🛥️", type: "water" },
+    { zh: "潭", tw: "thâm", en: "Deep Lake", emoji: "💧", type: "water" },
+    { zh: "海", tw: "hái", en: "Sea/Ocean", emoji: "🌊", type: "water" },
+    { zh: "島", tw: "tó", en: "Island", emoji: "🏝️", type: "land" },
+    { zh: "樹仔", tw: "chhiū-á", en: "Tree", emoji: "🌲", type: "nature" },
+    { zh: "溫泉", tw: "un-tsuân", en: "Hot Spring", emoji: "♨️", type: "water" },
+    { zh: "龜", tw: "ku", en: "Turtle", emoji: "🐢", type: "nature" },
+    { zh: "魚", tw: "hî", en: "Fish", emoji: "🐟", type: "nature" },
+    { zh: "峽谷", tw: "ha̍p-kok", en: "Canyon", emoji: "🪨", type: "land" },
+    { zh: "石頭", tw: "chio̍h-thâu", en: "Stone/Rock", emoji: "🗿", type: "nature" },
+    { zh: "雪", tw: "seh", en: "Snow", emoji: "❄️", type: "nature" },
+    { zh: "寶物", tw: "pó-bu̍t", en: "Treasure", emoji: "💎", type: "museum" },
+    { zh: "恐龍", tw: "khióng-liông", en: "Dinosaur", emoji: "🦖", type: "museum" },
+    { zh: "鯊魚", tw: "soa-hî", en: "Shark", emoji: "🦈", type: "water" },
+    { zh: "博物館", tw: "phok-bu̍t-koán", en: "Museum", emoji: "🏛️", type: "museum" },
+    { zh: "瀑布", tw: "pha̍k-poo", en: "Waterfall", emoji: "💦", type: "water" },
+    { zh: "老街", tw: "lāu-ke", en: "Old Street", emoji: "🏮", type: "culture" },
+    { zh: "古堡", tw: "kóo-pó", en: "Old Fort", emoji: "🏰", type: "culture" },
+    { zh: "燈塔", tw: "teng-thah", en: "Lighthouse", emoji: "🗼", type: "culture" },
+    { zh: "濕地", tw: "si̍p-tē", en: "Wetland", emoji: "🦀", type: "nature" },
+    { zh: "夜市", tw: "iā-chhī", en: "Night Market", emoji: "🌙", type: "culture" },
+    { zh: "廟", tw: "biō", en: "Temple", emoji: "⛩️", type: "culture" },
+    { zh: "珊瑚", tw: "san-hôo", en: "Coral", emoji: "🪸", type: "water" },
+    { zh: "藝術", tw: "gē-su̍t", en: "Art", emoji: "🎨", type: "museum" },
+    { zh: "化石", tw: "hòa-seh", en: "Fossil", emoji: "🦣", type: "museum" },
+    { zh: "石器", tw: "chio̍h-khì", en: "Stone Tool", emoji: "🪨", type: "museum" },
+    { zh: "科學", tw: "kho-ha̍k", en: "Science", emoji: "🔬", type: "museum" },
+    { zh: "香腸", tw: "hiong-tsiâng", en: "Sausage", emoji: "🌭", type: "culture" },
+    { zh: "歷史", tw: "li̍k-sú", en: "History", emoji: "🚢", type: "museum" },
+    { zh: "文學", tw: "bûn-ha̍k", en: "Literature", emoji: "📚", type: "museum" },
+    { zh: "法律", tw: "huat-lu̍t", en: "Law", emoji: "⚖️", type: "culture" },
+    { zh: "建築", tw: "kiàn-tio̍k", en: "Architecture", emoji: "🔺", type: "culture" },
+    { zh: "噶瑪蘭", tw: "Kat-má-lân", en: "Kavalan", emoji: "🛶", type: "culture" },
+    { zh: "史前", tw: "sú-tsîng", en: "Prehistoric", emoji: "🏺", type: "museum" },
+    { zh: "工藝", tw: "kang-gī", en: "Craft/Technology", emoji: "🏗️", type: "museum" },
+    { zh: "美術", tw: "bí-su̍t", en: "Fine Arts", emoji: "🎨", type: "museum" },
+    { zh: "科技", tw: "kho-kī", en: "Technology", emoji: "⚙️", type: "museum" },
+    { zh: "考古", tw: "khó-kóo", en: "Archaeology", emoji: "🦕", type: "museum" },
+    { zh: "黃金", tw: "hông-kim", en: "Gold", emoji: "🪙", type: "culture" },
+    { zh: "現代", tw: "hiān-tāi", en: "Modern", emoji: "🏙️", type: "culture" },
+    { zh: "展覽", tw: "tián-lám", en: "Exhibition", emoji: "🖼️", type: "museum" },
+    { zh: "陶瓷", tw: "tô-hûi", en: "Ceramics", emoji: "🏺", type: "museum" },
+    { zh: "教育", tw: "kàu-io̍k", en: "Education", emoji: "🎓", type: "museum" },
+    { zh: "當代", tw: "tòng-tāi", en: "Contemporary", emoji: "🏙️", type: "museum" },
+    { zh: "郵政", tw: "iû-tsìng", en: "Postal Service", emoji: "📮", type: "culture" },
+    { zh: "茶業", tw: "tê-gia̍p", en: "Tea Industry", emoji: "🍵", type: "nature" },
+    { zh: "泰雅", tw: "Thài-ia", en: "Atayal", emoji: "🏹", type: "culture" },
+    { zh: "書法", tw: "su-huat", en: "Calligraphy", emoji: "🖌️", type: "museum" },
+    { zh: "木藝", tw: "bo̍k-gī", en: "Wood Art", emoji: "🪵", type: "museum" },
+    { zh: "玻璃", tw: "pō-lê", en: "Glass", emoji: "🍺", type: "museum" },
+    { zh: "影像", tw: "íng-siōng", en: "Image/Photo", emoji: "📷", type: "museum" },
+    { zh: "客家", tw: "Kheh-ka", en: "Hakka", emoji: "🏮", type: "culture" },
+    { zh: "木雕", tw: "bo̍k-tiau", en: "Wood Carving", emoji: "🪵", type: "museum" },
+    { zh: "世界", tw: "sè-kài", en: "World", emoji: "🌐", type: "culture" },
+    { zh: "布袋戲", tw: "poo-tē-hì", en: "Puppet Show", emoji: "🎭", type: "culture" },
+    { zh: "南院", tw: "Lâm-īnn", en: "Southern Branch", emoji: "🏛️", type: "museum" },
+    { zh: "菸葉", tw: "hun-hio̍h", en: "Tobacco Leaf", emoji: "🍂", type: "culture" },
+    { zh: "傳統", tw: "thoân-thóng", en: "Traditional", emoji: "🏺", type: "culture" },
+    { zh: "石雕", tw: "tsioh-tiau", en: "Stone Carving", emoji: "🗿", type: "museum" },
+    { zh: "生活", tw: "sing-ua̍h", en: "Life", emoji: "🏡", type: "culture" },
+    { zh: "民俗", tw: "bîn-sio̍k", en: "Folk Custom", emoji: "🏮", type: "culture" },
+    { zh: "城", tw: "siâⁿ", en: "Castle/Wall", emoji: "🏯", type: "culture" },
+    { zh: "儒學", tw: "jû-ha̍k", en: "Confucianism", emoji: "📜", type: "culture" },
+    { zh: "大砲", tw: "tāi-phàu", en: "Cannon", emoji: "💣", type: "culture" },
+    { zh: "忠臣", tw: "tiong-sîn", en: "Loyal Official", emoji: "🛡️", type: "culture" },
+    { zh: "貞節", tw: "tsing-tsiat", en: "Chastity/Loyalty", emoji: "🌸", type: "culture" },
+    { zh: "媽祖", tw: "Má-tsoo", en: "Matsu", emoji: "👵", type: "culture" },
+    { zh: "關帝", tw: "Kuan-tè", en: "Guandi/War God", emoji: "🧔", type: "culture" },
+    { zh: "百貨", tw: "pah-huè", en: "Department Store", emoji: "🛍️", type: "culture" },
+    { zh: "塔", tw: "thah", en: "Pagoda/Tower", emoji: "🛕", type: "culture" },
+    { zh: "渡輪", tw: "tōo-lûn", en: "Ferry", emoji: "🛳️", type: "water" },
+    { zh: "菩薩", tw: "Phôo-sat", en: "Bodhisattva", emoji: "🧘", type: "culture" },
+    { zh: "猴", tw: "kâu", en: "Monkey", emoji: "🐒", type: "nature" },
+    { zh: "紙傘", tw: "tsuá-suànn", en: "Paper Umbrella", emoji: "☂️", type: "culture" },
+    { zh: "鐵橋", tw: "thih-kiô", en: "Iron Bridge", emoji: "🌉", type: "land" },
+    { zh: "歌", tw: "kua", en: "Song", emoji: "🎵", type: "culture" },
+    { zh: "帆船", tw: "phân-tsûn", en: "Sailboat", emoji: "⛵", type: "water" },
+    { zh: "眷村", tw: "kùn-tshuan", en: "Military Village", emoji: "🏡", type: "culture" },
+    { zh: "芬多精", tw: "hun-to-tsing", en: "Phytoncide", emoji: "🌲", type: "nature" },
+    { zh: "教堂", tw: "kàu-tn̂g", en: "Church", emoji: "⛪", type: "culture" },
+    { zh: "歌劇", tw: "koa-ke̍k", en: "Opera", emoji: "🎭", type: "culture" },
+    { zh: "甘蔗", tw: "kam-tsià", en: "Sugarcane", emoji: "🎋", type: "nature" },
+    { zh: "吊橋", tw: "tiāu-kiô", en: "Suspension Bridge", emoji: "🌉", type: "land" },
+    // --- 人權和平紀念詞彙 (Human Rights & Peace) ---
+    { zh: "和平", tw: "hô-pîng", en: "Peace", emoji: "🕊️", type: "culture" },
+    { zh: "人權", tw: "jîn-khoân", en: "Human Rights", emoji: "✊", type: "culture" },
+    { zh: "紀念", tw: "kì-liām", en: "Commemoration", emoji: "🕯️", type: "culture" },
+    { zh: "民主", tw: "bîn-tsú", en: "Democracy", emoji: "🗳️", type: "culture" },
+    { zh: "自由", tw: "tsū-iû", en: "Freedom", emoji: "🗽", type: "culture" },
+    { zh: "真相", tw: "tsin-siòng", en: "Truth", emoji: "🔍", type: "culture" },
+];
+
+// ===========================================================
+// 3. 語音引擎 — ChhoeTaigi 音節序列真人發音 + Web Speech API 備援
+// 架構參考 Taiwanese Lô-má-jī Tone Sandhi Tool 專案
+// ===========================================================
+
+// ChhoeTaigi KipSutian 音節音檔 ID 對照表（1,800+ 台羅音節）
+const syllableAudioMap = {"tsit8":"1(1)","it4":"2(1)","ting1":"39(1)","tshit4":"40(1)","kau2":"41(1)","kiu2":"42(1)","liau2":"43(1)","ji7":"44(1)","li7":"44(1)","jin5":"45(1)","lin5":"45(1)","lang5":"46(1)","jip8":"47(1)","lip8":"47(1)","pat4":"48(1)","peh4":"49(1)","pueh4":"49(1)","to1":"50(1)","tiau1":"51(1)","lat8":"52(1)","lik8":"53(1)","tsap8":"54(1)","sip8":"55(1)","poh4":"56(1)","pok4":"57(1)","iu7":"58(1)","tng7":"161(1)","sam1":"162(1)","sann1":"163(1)","tsiunn7":"164(1)","tshiunn7":"165(1)","siong7":"166(1)","e7":"167(1)","ha7":"168(1)","he7":"169(1)","ke7":"170(1)","e5":"171(1)","uan5":"172(1)","ku2":"173(1)","io1":"174(1)","khit4":"175(1)","ia7":"176(1)","bong5":"177(1)","huan5":"178(1)","huan7":"179(1)","tshian1":"180(1)","tshing1":"181(1)","tshe1":"182(1)","khau2":"183(1)","thoo2":"184(1)","su7":"185(1)","ta1":"186(1)","tai7":"187(1)","tua7":"188(1)","li2":"189(1)","lu2":"189(1)","tsi2":"191(1)","tsu2":"192(1)","ji2":"193(1)","tshun3":"194(1)","siau2":"195(1)","sio2":"196(1)","san1":"197(1)","suann1":"198(1)","kang1":"199(1)","kong1":"200(1)","ki2":"201(1)","tsi7":"202(1)","kin1":"203(1)","kun1":"203(1)","kan1":"204(1)","king1":"205(1)","tsai5":"206(1)","tsiah4":"207(1)","tshai5":"208(1)","put4":"557(1)","thiu2":"558(1)","ting3":"559(1)","tiong1":"560(1)","tiong3":"561(1)","tan1":"562(1)","tsi1":"563(1)","hoo7":"564(1)","goo7":"565(1)","ngoo2":"566(1)","tsenn2":"567(1)","tsinn2":"567(1)","tseh4":"569(1)","phak4":"570(1)","siu5":"571(1)","tann1":"572(1)","in2":"573(1)","un2":"573(1)","lai7":"574(1)","lue7":"575(1)","lak8":"578(1)","liok8":"579(1)","phann3":"580(1)","ling7":"581(1)","liong7":"582(1)","hiong1":"583(1)","hun1":"584(1)","pun1":"585(1)","tshiat4":"586(1)","un5":"587(1)","kiu1":"588(1)","kau1":"589(1)","hua1":"771(1)","hua3":"772(1)","phit4":"773(1)","tsin1":"774(1)","sing1":"775(1)","eh4":"778(1)","iu2":"779(1)","huan2":"780(1)","ping2":"781(1)","jim5":"782(1)","lim5":"782(1)","thian1":"783(1)","thinn1":"784(1)","thai3":"785(1)","hu1":"786(1)","tsio2":"787(1)","tshioh4":"789(1)","jiap8":"790(1)","liap8":"790(1)","sim1":"792(1)","tshiu2":"794(1)","ki1":"795(1)","bun5":"796(1)","tau2":"797(1)","hng1":"799(1)","hong1":"800(1)","jit8":"801(1)","lit8":"801(1)","guat8":"802(1)","gueh8":"803(1)","geh8":"803(1)","bak8":"804(1)","bok8":"805(1)","khiam3":"806(1)","phainn2":"808(1)","m7":"809(1)","pi2":"810(1)","mng5":"811(1)","moo5":"812(1)","si7":"813(1)","tsui2":"814(1)","sui2":"815(1)","hue2":"1211(1)","he2":"1211(1)","jiau2":"1212(1)","niau2":"1212(1)","hu7":"1213(1)","ping5":"1214(1)","phinn3":"1215(1)","ga5":"1216(1)","ge5":"1217(1)","gu5":"1218(1)","ong5":"1219(1)","se3":"1292(1)","si3":"1293(1)","piann2":"1294(1)","tom5":"1296(1)","tsann3":"1297(1)","hat8":"1299(1)","a2":"1300(1)","hu3":"1302(1)","sian1":"1303(1)","sian2":"1304(1)","kang7":"1305(1)","te7":"1307(1)","i2":"1310(1)","hiann1":"1311(1)","tsheh4":"1312(1)","tang1":"1376(1)","nah4":"1377(1)","tshut4":"1378(1)","khan1":"1379(1)","ka1":"1381(1)","ke1":"1383(1)","pau1":"1384(1)","pak4":"1385(1)","puan3":"1386(1)","puann3":"1387(1)","siap4":"1388(1)","tsiam3":"1389(1)","khah4":"1390(1)","khah8":"1391(1)","bau2":"1392(1)","mauh4":"1394(1)","khi3":"1395(1)","koo2":"1396(1)","ku3":"1397(1)","lo1":"1398(1)","khau3":"1399(1)","kio3":"1402(1)","kho2":"1405(1)","tai5":"1406(1)","su3":"1409(1)","gua7":"1410(1)","iang1":"1411(1)","gia5":"1634(1)","sit4":"1635(1)","loo5":"1636(1)","ling1":"1637(1)","ni1":"1637(1)","nai1":"1638(1)","kha2":"1639(1)","khiau2":"1640(1)","tshi7":"1641(1)","poo3":"1642(1)","penn5":"1643(1)","pinn5":"1643(1)","piann5":"1644(1)","iu3":"1646(1)","boo7":"1647(1)","pe1":"1648(1)","pe5":"1649(1)","tann2":"1650(1)","tuann3":"1651(1)","bi7":"1652(1)","bue7":"1653(1)","be7":"1653(1)","pun2":"1654(1)","tsiann3":"1655(1)","tsing3":"1656(1)","bio2":"1657(1)","bo2":"1658(1)","bu2":"1659(1)","bin5":"1660(1)","tsiap4":"1661(1)","gik8":"1835(1)","giok8":"1836(1)","kue1":"1837(1)","hia7":"1838(1)","kam1":"1839(1)","tshenn1":"1840(1)","tshinn1":"1840(1)","senn1":"1841(1)","sinn1":"1841(1)","ing7":"1843(1)","iong7":"1844(1)","tshan5":"1845(1)","iu5":"1846(1)","kah4":"1847(1)","sin1":"1849(1)","peh8":"1850(1)","pik8":"1851(1)","phi5":"1852(1)","phue5":"1853(1)","phe5":"1853(1)","tsioh8":"1856(1)","sik8":"1857(1)","hiat8":"1859(1)","kiau1":"2040(1)","hai7":"2041(1)","ik8":"2042(1)","kiann7":"2043(1)","jim7":"2044(1)","lim7":"2044(1)","hun7":"2045(1)","hong2":"2046(1)","i1":"2047(1)","huah8":"2048(1)","hiu1":"2049(1)","thin7":"2050(1)","tiau7":"2051(1)","kng1":"2054(1)","tsuan5":"2056(1)","ka7":"2099(1)","kiong7":"2101(1)","tsai3":"2102(1)","ping1":"2103(1)","tainn2":"2104(1)","hing5":"2105(1)","ko3":"2106(1)","liat8":"2107(1)","in3":"2109(1)","hah8":"2110(1)","hap8":"2111(1)","kap4":"2112(1)","kiat4":"2113(1)","tiau3":"2114(1)","tong5":"2115(1)","bing5":"2116(1)","mia5":"2117(1)","thoo3":"2119(1)","ann3":"2120(1)","hiann3":"2121(1)","hiong3":"2122(1)","ng3":"2123(1)","kiann2":"2124(1)","hue5":"2125(1)","he5":"2125(1)","sin3":"2126(1)","in1":"2127(1)","tsai7":"2128(1)","tue7":"2268(1)","tsun3":"2269(1)","ho2":"2272(1)","honn3":"2273(1)","ju5":"2274(1)","lu5":"2274(1)","hui1":"2275(1)","tsun5":"2277(1)","theh8":"2278(1)","tsiu2":"2279(1)","siu2":"2280(1)","an1":"2281(1)","tsiam1":"2283(1)","tsiu1":"2284(1)","phang5":"2286(1)","lian5":"2287(1)","ni5":"2288(1)","tsng1":"2289(1)","sut4":"2424(1)","tsiann5":"2425(1)","siann5":"2426(1)","sing5":"2427(1)","thuh4":"2428(1)","huann7":"2430(1)","khau1":"2431(1)","tshuann1":"2433(1)","siu1":"2434(1)","tsa2":"2435(1)","khiau1":"2436(1)","khik4":"2437(1)","u7":"2439(1)","tsu1":"2440(1)","tshu3":"2441(1)","tshu2":"2442(1)","si2":"2443(1)","su2":"2444(1)","kuann7":"2582(1)","ti5":"2584(1)","pah4":"2585(1)","tik4":"2586(1)","bi2":"2587(1)","iunn5":"2588(1)","lau2":"2589(1)","lau7":"2590(1)","hinn7":"2592(1)","hi7":"2592(1)","ni2":"2593(1)","ut8":"2594(1)","bah4":"2595(1)","jiok8":"2596(1)","sin5":"2597(1)","tsu7":"2598(1)","tsih8":"2599(1)","sik4":"2600(1)","hiann7":"2601(1)","ngai7":"2602(1)","hiat4":"2603(1)","hueh4":"2604(1)","huih4":"2604(1)","hang5":"2605(1)","hing7":"2606(1)","kiann5":"2607(1)","ui1":"2830(1)","sai1":"2831(1)","se1":"2832(1)","tshng3":"2850(1)","tshuan3":"2851(1)","phuann7":"2854(1)","tshun1":"2855(1)","phenn1":"2857(1)","ti7":"2858(1)","ui7":"2860(1)","ho5":"2861(1)","to2":"2862(1)","toh4":"2863(1)","hut8":"2864(1)","put8":"2865(1)","tsoh4":"2866(1)","tsok4":"2867(1)","tui7":"2871(1)","bian2":"2872(1)","ling2":"2874(1)","phut4":"2945(1)","thai5":"2946(1)","phuann3":"2947(1)","pat8":"2948(1)","piat8":"2949(1)","tsoo7":"2951(1)","kiap4":"2952(1)","nng7":"2953(1)","thun1":"2955(1)","gim5":"2956(1)","pui7":"2957(1)","kam5":"2958(1)","kann5":"2959(1)","khngh4":"2960(1)","khong7":"2961(1)","tshng2":"2962(1)","tsha2":"2964(1)","na7":"2965(1)","khip4":"2966(1)","tshue1":"2967(1)","hau2":"2968(1)","tai1":"3014(1)","tun2":"3016(1)","khng3":"3017(1)","hut4":"3018(1)","bue5":"3019(1)","thun7":"3020(1)","kham2":"3021(1)","tse7":"3022(1)","tshe7":"3023(1)","khenn1":"3024(1)","khinn1":"3024(1)","ngeh4":"3025(1)","iau1":"3048(1)","kim7":"3049(1)","miau7":"3050(1)","hau3":"3052(1)","song3":"3053(1)","ang1":"3055(1)","bue2":"3056(1)","be2":"3056(1)","jio7":"3057(1)","lio7":"3057(1)","kiok8":"3058(1)","phui3":"3059(1)","sun5":"3060(1)","tshng5":"3126(1)","sng5":"3127(1)","lang7":"3129(1)","khi7":"3133(1)","jim2":"3134(1)","lim2":"3134(1)","lun2":"3135(1)","tsi3":"3136(1)","bong7":"3137(1)","khuai3":"3138(1)","gua2":"3139(1)","ngiu2":"3141(1)","pan7":"3143(1)","tshe2":"3144(1)","khip8":"3145(1)","gim7":"3146(1)","pian1":"3147(1)","keh8":"3148(1)","hu5":"3149(1)","phoo5":"3150(1)","io2":"3151(1)","phue1":"3195(1)","tsau7":"3196(1)","tshau1":"3198(1)","kuat4":"3199(1)","pe2":"3200(1)","tim3":"3201(1)","la7":"3202(1)","iah8":"3203(1)","jiau3":"3204(1)","liau3":"3204(1)","tau5":"3206(1)","tsiat4":"3207(1)","kai2":"3209(1)","han7":"3211(1)","uann7":"3213(1)","kenn1":"3214(1)","kinn1":"3214(1)","kuainn1":"3215(1)","kuann1":"3216(1)","siah8":"3221(1)","khit8":"3222(1)","sok4":"3274(1)","poo7":"3275(1)","mui2":"3276(1)","kiu5":"3277(1)","tsiann2":"3278(1)","thua7":"3280(1)","ak4":"3281(1)","tim5":"3282(1)","bak4":"3283(1)","bit8":"3284(1)","tshiang5":"3285(1)","tshiong1":"3286(1)","sua1":"3287(1)","tsau3":"3288(1)","tsai1":"3328(1)","tse1":"3329(1)","tiau5":"3330(1)","kong5":"3331(1)","lam5":"3332(1)","phi2":"3334(1)","tso7":"3335(1)","su1":"3337(1)","han2":"3339(1)","too2":"3340(1)","too7":"3341(1)","oo7":"3383(1)","kian3":"3384(1)","kinn3":"3385(1)","kak4":"3386(1)","gian5":"3387(1)","tau7":"3388(1)","tshiah4":"3389(1)","tsau2":"3390(1)","tsiok4":"3391(1)","tshia1":"3394(1)","na2":"3397(1)","sia5":"3398(1)","guan2":"3401(1)","hong5":"3402(1)","ping7":"3518(1)","phing7":"3519(1)","kuai1":"3520(1)","tenn3":"3526(1)","tinn3":"3526(1)","sai2":"3527(1)","lai5":"3529(1)","le7":"3530(1)","king3":"3532(1)","liong2":"3582(1)","niu2":"3583(1)","ki5":"3585(1)","khu7":"3586(1)","tian2":"3587(1)","tshoo1":"3589(1)","kueh4":"3590(1)","kuih4":"3590(1)","khe1":"3591(1)","kau3":"3592(1)","tse3":"3593(1)","kng3":"3594(1)","kuan3":"3595(1)","tshi3":"3596(1)","tok4":"3599(1)","khap4":"3600(1)","tsut4":"3601(1)","kua3":"3602(1)","kng2":"3603(1)","sia3":"3605(1)","tsik4":"3606(1)","siu7":"3608(1)","tshan1":"3690(1)","hoo1":"3691(1)","khoo1":"3692(1)","bing7":"3693(1)","mia7":"3694(1)","tann3":"3695(1)","ham7":"3697(1)","tsiu3":"3699(1)","khun5":"3700(1)","khann1":"3701(1)","phe1":"3703(1)","ing1":"3753(1)","khu1":"3754(1)","phann7":"3756(1)","khia1":"3758(1)","mue7":"3759(1)","tshiap4":"3761(1)","m2":"3762(1)","tse2":"3763(1)","koo1":"3765(1)","senn3":"3766(1)","sinn3":"3766(1)","sing3":"3767(1)","kui3":"3806(1)","kuan1":"3808(1)","tiann7":"3810(1)","ting7":"3811(1)","kai3":"3812(1)","khut4":"3813(1)","phe3":"3816(1)","thiap4":"3817(1)","te2":"3819(1)","tue2":"3819(1)","tiam3":"3821(1)","hu2":"3873(1)","tshian5":"3874(1)","he1":"3875(1)","hit4":"3876(1)","ing2":"3877(1)","ong2":"3878(1)","thiam2":"3879(1)","liam7":"3881(1)","koo7":"3882(1)","kuai3":"3884(1)","kue3":"3885(1)","hoo3":"3886(1)","pang5":"3934(1)","pong5":"3935(1)","soo2":"3936(1)","phiann1":"3939(1)","phi1":"3940(1)","pho7":"3941(1)","buah4":"3942(1)","ah4":"3943(1)","thiu1":"3944(1)","khioh4":"3945(1)","bin2":"3946(1)","tu2":"3948(1)","thiah4":"3949(1)","liam1":"3950(1)","pha1":"3953(1)","phau1":"3954(1)","puann7":"3955(1)","phah4":"3956(1)","phik4":"3957(1)","ling5":"3958(1)","kuai2":"3959(1)","kuainn7":"3960(1)","khinn5":"3961(1)","puah8":"3962(1)","pueh8":"3963(1)","puih8":"3963(1)","thua1":"3964(1)","au2":"3965(1)","piann3":"3966(1)","tsiau1":"3967(1)","tsio1":"3968(1)","hong3":"3969(1)","pang3":"3970(1)","ong7":"3971(1)","hok8":"4184(1)","phue3":"4185(1)","pue1":"4186(1)","tong1":"4188(1)","pan2":"4189(1)","pi5":"4190(1)","pang1":"4191(1)","na5":"4193(1)","ko2":"4194(1)","tauh8":"4250(1)","phueh8":"4251(1)","pheh8":"4251(1)","tsam1":"4256(1)","ian5":"4257(1)","tsuh4":"4259(1)","tsuah4":"4260(1)","tsuat4":"4261(1)","am2":"4262(1)","huat4":"4263(1)","pha7":"4310(1)","phau3":"4311(1)","pho1":"4312(1)","pho3":"4313(1)","tsu3":"4315(1)","tu3":"4316(1)","iam7":"4318(1)","khong3":"4320(1)","tsenn1":"4322(1)","tsinn1":"4322(1)","pa5":"4323(1)","pe7":"4324(1)","but8":"4326(1)","mih8":"4327(1)","mngh8":"4327(1)","tsng7":"4328(1)","tit8":"4373(1)","ti1":"4375(1)","sia7":"4377(1)","tshai7":"4378(1)","khang1":"4379(1)","kiu3":"4414(1)","bong2":"4415(1)","kiunn1":"4416(1)","tsia2":"4417(1)","pui5":"4420(1)","khing2":"4421(1)","hi3":"4422(1)","khian3":"4424(1)","hue1":"4426(1)","phang1":"4427(1)","hoo2":"4482(1)","khiu5":"4483(1)","piau2":"4484(1)","pio2":"4485(1)","kauh4":"4486(1)","ngia5":"4487(1)","kin7":"4488(1)","kun7":"4488(1)","hann7":"4489(1)","kim1":"4490(1)","tiong2":"4491(1)","tiunn2":"4492(1)","tng5":"4493(1)","a1":"4496(1)","u2":"4498(1)","ting5":"4665(1)","tshim1":"4666(1)","thiann7":"4667(1)","pian7":"4668(1)","tshik4":"4669(1)","tshio1":"4689(1)","siok8":"4690(1)","po2":"4691(1)","thi3":"4694(1)","tsho3":"4695(1)","siah4":"4696(1)","tsian5":"4698(1)","tsing5":"4699(1)","iong2":"4700(1)","khiok4":"4702(1)","li5":"4703(1)","kau7":"4769(1)","teh4":"4771(1)","meh4":"4772(1)","kok8":"4774(1)","khak8":"4775(1)","lan2":"4776(1)","ai1":"4778(1)","phin2":"4779(1)","ha1":"4780(1)","sui5":"4782(1)","khe3":"4821(1)","khue3":"4821(1)","hai1":"4822(1)","i7":"4823(1)","kan3":"4824(1)","i5":"4825(1)","hai5":"4849(1)","kheh4":"4850(1)","si1":"4854(1)","ba7":"4856(1)","hang7":"4857(1)","te3":"4858(1)","thai7":"4896(1)","lut8":"4897(1)","au7":"4898(1)","kip4":"4900(1)","uan3":"4901(1)","tiam7":"4903(1)","pinn2":"4904(1)","pai3":"4905(1)","kuah4":"4906(1)","hiap8":"4978(1)","tih8":"4980(1)","tsainn2":"4981(1)","an3":"4984(1)","keh4":"4985(1)","thio1":"4986(1)","tha3":"4987(1)","hiannh4":"4988(1)","hinn3":"4989(1)","oo2":"4990(1)","ue2":"4990(1)","koo3":"4992(1)","ah8":"4998(1)","ke3":"5063(1)","ke5":"5065(1)","penn3":"5066(1)","pinn3":"5066(1)","boo2":"5067(1)","jiam2":"5069(1)","liam2":"5069(1)","tsha5":"5073(1)","kua1":"5074(1)","thiau7":"5075(1)","uai1":"5119(1)","tuann7":"5120(1)","tok8":"5121(1)","thau7":"5122(1)","tsuann5":"5124(1)","se2":"5127(1)","sue2":"5127(1)","tong7":"5129(1)","tin1":"5130(1)","siap8":"5131(1)","uah8":"5166(1)","phai3":"5167(1)","lau5":"5168(1)","liu5":"5169(1)","tshio7":"5170(1)","thuann3":"5171(1)","pu5":"5173(1)","te1":"5174(1)","tsa3":"5175(1)","tsuann3":"5176(1)","ui5":"5177(1)","ui3":"5216(1)","pa1":"5217(1)","khi5":"5219(1)","kui2":"5220(1)","kai1":"5221(1)","phun5":"5222(1)","sio1":"5224(1)","siong1":"5225(1)","siong3":"5226(1)","siunn3":"5227(1)","tuh4":"5228(1)","sing2":"5304(1)","bai5":"5305(1)","bi5":"5306(1)","khan3":"5307(1)","khuann3":"5308(1)","huah4":"5310(1)","ging2":"5311(1)","tshiu1":"5312(1)","kho1":"5313(1)","tshing7":"5315(1)","tshng1":"5316(1)","iok4":"5364(1)","ang5":"5365(1)","sng2":"5369(1)","luan2":"5370(1)","nai7":"5371(1)","pue7":"5373(1)","thai1":"5374(1)","the1":"5375(1)","kian7":"5376(1)","ti3":"5378(1)","kho5":"5449(1)","khoo2":"5452(1)","om7":"5454(1)","kio5":"5455(1)","khing7":"5456(1)","pik4":"5496(1)","long5":"5497(1)","tang7":"5498(1)","tiong5":"5500(1)","tiong7":"5501(1)","tshuann3":"5502(1)","kang3":"5504(1)","an7":"5505(1)","bian7":"5562(1)","bin7":"5563(1)","kik4":"5564(1)","im1":"5565(1)","tsiah8":"5570(1)","sit8":"5571(1)","hiunn1":"5572(1)","an2":"5691(1)","to3":"5707(1)","sing7":"5708(1)","ua2":"5709(1)","tsioh4":"5710(1)","tshiann3":"5711(1)","song5":"5712(1)","tat8":"5713(1)","kiam1":"5715(1)","uan1":"5716(1)","tsun2":"5717(1)","tshin3":"5718(1)","tang3":"5719(1)","tong3":"5720(1)","thak8":"5721(1)","khiang1":"5788(1)","hui2":"5789(1)","ko1":"5792(1)","mai1":"5794(1)","pu1":"5797(1)","hainn1":"5799(1)","kenn2":"5801(1)","kinn2":"5801(1)","haih4":"5803(1)","onn1":"5804(1)","tsim1":"5805(1)","poo1":"5857(1)","tiann5":"5858(1)","tho3":"5860(1)","nia5":"5861(1)","niu5":"5862(1)","sun1":"5875(1)","kiong1":"5877(1)","iong5":"5881(1)","thian2":"5885(1)","ban1":"5886(1)","kham3":"5888(1)","tsha1":"5890(1)","khoo3":"5896(1)","too5":"5949(1)","lin2":"5950(1)","thi2":"5951(1)","un1":"5952(1)","kun5":"5956(1)","kheh8":"5957(1)","e1":"5959(1)","ue1":"5959(1)","thuah4":"5960(1)","long3":"5982(1)","thann2":"5983(1)","jue5":"5984(1)","le5":"5984(1)","ban2":"5985(1)","giap8":"5986(1)","ngeh8":"5987(1)","thong2":"5989(1)","khun2":"5990(1)","luah8":"5991(1)","luah4":"5992(1)","bat4":"5993(1)","sa1":"5994(1)","tenn7":"5996(1)","tinn7":"5996(1)","sak4":"5997(1)","poo5":"5998(1)","tsun7":"5999(1)","tshih8":"6001(1)","hau7":"6003(1)","liau7":"6004(1)","si5":"6006(1)","huann2":"6007(1)","uann3":"6075(1)","tshiann5":"6076(1)","tim7":"6079(1)","sng1":"6081(1)","tho5":"6088(1)","khing1":"6089(1)","khong1":"6090(1)","sue1":"6149(1)","hap4":"6150(1)","khui3":"6152(1)","phu7":"6153(1)","phu5":"6154(1)","hai2":"6155(1)","tsim3":"6156(1)","siau1":"6224(1)","oo1":"6227(1)","hang1":"6228(1)","tia1":"6229(1)","eh8":"6230(1)","ueh8":"6230(1)","pan1":"6334(1)","thik4":"6337(1)","tshua7":"6338(1)","tshuah4":"6339(1)","thiann3":"6340(1)","ku1":"6341(1)","penn7":"6342(1)","pinn7":"6342(1)","hin5":"6376(1)","tiam1":"6377(1)","phua3":"6379(1)","tsoo2":"6380(1)","su5":"6423(1)","tsoo1":"6424(1)","ng1":"6426(1)","tsam7":"6427(1)","tshio3":"6428(1)","hun2":"6429(1)","lap8":"6430(1)","tsua2":"6477(1)","soo3":"6479(1)","phang2":"6480(1)","soh4":"6481(1)","khih4":"6482(1)","khuat4":"6483(1)","khueh4":"6484(1)","hang3":"6489(1)","hing1":"6490(1)","kui1":"6528(1)","tshe3":"6529(1)","meh8":"6530(1)","tshau3":"6531(1)","iunn2":"6532(1)","tsinn7":"6533(1)","bang5":"6535(1)","te5":"6537(1)","tshau2":"6538(1)","tsho2":"6539(1)","lam2":"6629(1)","tho2":"6667(1)","ki3":"6668(1)","pa3":"6669(1)","khi2":"6671(1)","thang3":"6672(1)","be5":"6673(1)","piang3":"6674(1)","tui1":"6675(1)","the3":"6676(1)","sang3":"6677(1)","to5":"6678(1)","siam2":"6790(1)","inn7":"6791(1)","tin7":"6793(1)","tu5":"6794(1)","ma2":"6799(1)","kut4":"6800(1)","tau3":"6802(1)","khian5":"6906(1)","ian2":"6907(1)","ka2":"6908(1)","ke2":"6909(1)","phian1":"6911(1)","phinn1":"6912(1)","tso3":"6913(1)","tsue3":"6913(1)","thing5":"6914(1)","ainn7":"6915(1)","iang7":"6915(1)","thau1":"6916(1)","tau1":"6917(1)","tsian2":"6918(1)","bu7":"7006(1)","pian2":"7009(1)","tsham1":"7011(1)","tshiang3":"7014(1)","tshiunn3":"7015(1)","lim1":"7018(1)","mng7":"7020(1)","tam1":"7021(1)","siann2":"7068(1)","lun1":"7070(1)","kok4":"7071(1)","pi1":"7073(1)","kian1":"7077(1)","po5":"7133(1)","kia3":"7136(1)","in5":"7137(1)","bat8":"7138(1)","tsiong1":"7139(1)","tsiong3":"7140(1)","tsuan1":"7141(1)","kia7":"7175(1)","tai3":"7177(1)","tua3":"7178(1)","tiunn1":"7179(1)","tng1":"7180(1)","kiong5":"7181(1)","tit4":"7183(1)","sua2":"7225(1)","khia7":"7226(1)","tsiong5":"7228(1)","sioh4":"7231(1)","tshing2":"7232(1)","khiat4":"7233(1)","so1":"7234(1)","ng2":"7235(1)","phong2":"7236(1)","tsiap8":"7288(1)","liam3":"7289(1)","hian1":"7293(1)","sau3":"7295(1)","pai5":"7297(1)","kut8":"7299(1)","khua3":"7301(1)","liah8":"7303(1)","tshai2":"7304(1)","tham3":"7305(1)","tsih4":"7307(1)","khang3":"7308(1)","thui1":"7310(1)","am1":"7311(1)","iam2":"7312(1)","om1":"7314(1)","khainn1":"7315(1)","pai7":"7317(1)","ka3":"7318(1)","tshia5":"7428(1)","tshuah8":"7429(1)","suan1":"7431(1)","tsok8":"7432(1)","bang7":"7435(1)","kenn3":"7438(1)","thang2":"7439(1)","hia1":"7441(1)","kuainn2":"7442(1)","mue5":"7443(1)","m5":"7443(1)","liau5":"7464(1)","sau1":"7466(1)","beh4":"7469(1)","suh4":"7470(1)","sat4":"7472(1)","sioh8":"7473(1)","liang5":"7474(1)","lui7":"7507(1)","tshian2":"7510(1)","thiam1":"7511(1)","u3":"7567(1)","song2":"7568(1)","khian1":"7570(1)","lue5":"7571(1)","bing2":"7572(1)","me2":"7573(1)","tshai1":"7574(1)","hian3":"7575(1)","hian7":"7576(1)","pan5":"7628(1)","hui5":"7629(1)","tinn1":"7630(1)","san2":"7631(1)","hun5":"7635(1)","ap8":"7637(1)","tshuh4":"7640(1)","gan2":"7642(1)","phio3":"7683(1)","that4":"7685(1)","tsiunn1":"7687(1)","leh8":"7688(1)","lueh8":"7688(1)","pun7":"7690(1)","ko5":"7692(1)","phoh4":"7714(1)","thinn7":"7716(1)","tsah4":"7718(1)","tsat4":"7719(1)","sue3":"7720(1)","sua3":"7721(1)","khong2":"7722(1)","hian5":"7723(1)","puah4":"7726(1)","tun5":"7779(1)","thuat4":"7780(1)","thut8":"7781(1)","poo2":"7782(1)","tsing1":"7783(1)","mai3":"7813(1)","o5":"7814(1)","ham1":"7815(1)","tshi1":"7817(1)","tshu1":"7817(1)","tsua5":"7818(1)","sut8":"7838(1)","phuah8":"7841(1)","pi7":"7842(1)","phue7":"7843(1)","phe7":"7843(1)","mai7":"7846(1)","siat4":"7848(1)","sinn7":"7849(1)","hue3":"7885(1)","he3":"7885(1)","huan3":"7886(1)","tham1":"7888(1)","lan1":"7891(1)","kue2":"7892(1)","nng2":"7893(1)","thau3":"7894(1)","jiok4":"7895(1)","lip4":"7895(1)","tak8":"7896(1)","tsit4":"7899(1)","thang1":"7900(1)","thong1":"7901(1)","tsua7":"7902(1)","thing2":"7903(1)","ia2":"8003(1)","tio3":"8004(1)","tshuan1":"8005(1)","pi3":"8006(1)","pue5":"8007(1)","nia7":"8009(1)","seh4":"8011(1)","suat4":"8012(1)","ting2":"8013(1)","hi5":"8084(1)","tsiau2":"8085(1)","lok8":"8086(1)","beh8":"8087(1)","ba5":"8088(1)","mua5":"8089(1)","png7":"8150(1)","suann3":"8151(1)","tshong1":"8157(1)","tshong3":"8158(1)","lo5":"8159(1)","phok4":"8160(1)","thi5":"8161(1)","khennh8":"8162(1)","nauh4":"8165(1)","sian7":"8166(1)","kainn1":"8167(1)","hiam3":"8168(1)","thih8":"8169(1)","tsu5":"8170(1)","iaunn1":"8171(1)","tshuan2":"8173(1)","tshui3":"8174(1)","sannh4":"8176(1)","liang1":"8246(1)","tuann1":"8247(1)","kham1":"8249(1)","po3":"8250(1)","tiunn5":"8251(1)","hoo5":"8252(1)","oo5":"8253(1)","pu3":"8286(1)","kuann5":"8287(1)","gan5":"8288(1)","tsun1":"8289(1)","siam5":"8290(1)","tsiu7":"8291(1)","to7":"8292(1)","bo7":"8322(1)","sun7":"8325(1)","ok4":"8341(1)","loo2":"8342(1)","sim7":"8343(1)","gang7":"8344(1)","tui5":"8345(1)","tsiong2":"8346(1)","tsiunn2":"8347(1)","pue2":"8350(1)","king2":"8351(1)","jiu5":"8353(1)","phiak8":"8354(1)","bok4":"8356(1)","bio5":"8357(1)","the5":"8358(1)","tshah4":"8360(1)","tshap4":"8361(1)","iap4":"8407(1)","tshue7":"8409(1)","tuh8":"8410(1)","tiap8":"8411(1)","phainn7":"8412(1)","kam2":"8414(1)","kann2":"8415(1)","san3":"8417(1)","suann2":"8418(1)","khi1":"8420(1)","thau2":"8421(1)","ne5":"8474(1)","thue3":"8475(1)","mi5":"8478(1)","tsang1":"8480(1)","tso2":"8481(1)","khuan2":"8519(1)","khuann2":"8520(1)","phu2":"8521(1)","khak4":"8522(1)","than2":"8523(1)","kiam2":"8524(1)","kang2":"8544(1)","khuah4":"8545(1)","thng1":"8549(1)","lam3":"8550(1)","bo5":"8563(1)","bu5":"8564(1)","thenn3":"8568(1)","gin7":"8570(1)","kau5":"8571(1)","iau2":"8572(1)","khim5":"8687(1)","huan1":"8688(1)","ue7":"8689(1)","puh4":"8696(1)","khun3":"8764(1)","tuan2":"8766(1)","khok8":"8767(1)","nge7":"8769(1)","ngi7":"8769(1)","tang5":"8774(1)","pit4":"8816(1)","tan2":"8817(1)","kiau2":"8819(1)","sun2":"8821(1)","tshue3":"8824(1)","kat4":"8827(1)","tseh8":"8829(1)","tsuat8":"8830(1)","an5":"8831(1)","jiong5":"8833(1)","liong5":"8833(1)","hip4":"8896(1)","tiunn3":"8899(1)","sin7":"8901(1)","khiunn1":"8902(1)","kiok4":"8929(1)","tshai3":"8930(1)","tioh8":"8981(1)","toh8":"8982(1)","hi1":"8983(1)","liah4":"8986(1)","lih8":"8987(1)","bih4":"8988(1)","le2":"9030(1)","lue2":"9030(1)","phing5":"9031(1)","mai2":"9038(1)","hui3":"9040(1)","tah4":"9041(1)","bau7":"9043(1)","than3":"9044(1)","uat8":"9045(1)","khu5":"9099(1)","phau2":"9100(1)","tshu7":"9102(1)","pai2":"9103(1)","tsin3":"9104(1)","soo1":"9134(1)","niu7":"9138(1)","giang1":"9139(1)","tun1":"9140(1)","tun3":"9141(1)","tun7":"9142(1)","liu2":"9143(1)","khai1":"9144(1)","khui1":"9145(1)","jun7":"9146(1)","lun7":"9146(1)","ing5":"9147(1)","gan7":"9213(1)","hiong5":"9215(1)","tsip8":"9216(1)","im2":"9223(1)","ng5":"9224(1)","luan7":"9283(1)","tshui1":"9284(1)","tsong5":"9285(1)","thng5":"9286(1)","thuan5":"9287(1)","siunn1":"9290(1)","thuann2":"9291(1)","li3":"9293(1)","tsau5":"9295(1)","khiang3":"9299(1)","hue7":"9300(1)","sa3":"9301(1)","phngh4":"9349(1)","hng5":"9351(1)","inn5":"9352(1)","thap4":"9354(1)","thah4":"9355(1)","thoo5":"9356(1)","thiong2":"9357(1)","thiam7":"9359(1)","un3":"9360(1)","so2":"9408(1)","hiam5":"9409(1)","hainn3":"9410(1)","siong2":"9421(1)","siunn7":"9422(1)","jia2":"9423(1)","lia2":"9423(1)","tshiu5":"9424(1)","ju2":"9425(1)","i3":"9426(1)","ai3":"9427(1)","tiuh4":"9475(1)","io5":"9476(1)","tshiau1":"9478(1)","khiu2":"9479(1)","hian2":"9480(1)","tsinn3":"9481(1)","me1":"9482(1)","mi1":"9482(1)","iah4":"9483(1)","tshiok8":"9484(1)","sam3":"9486(1)","sian3":"9487(1)","puann1":"9490(1)","tshiunn2":"9493(1)","kong3":"9494(1)","thin5":"9496(1)","am3":"9564(1)","ia5":"9567(1)","png1":"9568(1)","king7":"9570(1)","gong5":"9571(1)","hun3":"9573(1)","hioh4":"9633(1)","liu1":"9638(1)","tshi5":"9640(1)","ik4":"9641(1)","khue1":"9642(1)","biat8":"9682(1)","ko7":"9685(1)","tai2":"9686(1)","tsian1":"9687(1)","tsuann1":"9688(1)","piak4":"9689(1)","ian1":"9690(1)","suah4":"9691(1)","sah8":"9693(1)","tsiau3":"9716(1)","tsio3":"9717(1)","tng3":"9734(1)","tham5":"9735(1)","tsuann2":"9737(1)","gin5":"9738(1)","e2":"9739(1)","uann2":"9775(1)","pong7":"9776(1)","kim3":"9777(1)","pin2":"9780(1)","khio3":"9804(1)","tsueh4":"9806(1)","kin3":"9808(1)","ta3":"9812(1)","tsue7":"9814(1)","gi7":"9816(1)","siann3":"9852(1)","phing3":"9853(1)","nau2":"9855(1)","tsing2":"9856(1)","ku7":"9860(1)","ban7":"9861(1)","lak4":"9862(1)","lau3":"9863(1)","loh4":"9864(1)","loh8":"9865(1)","hioh8":"9974(1)","tsong3":"9976(1)","ho7":"9978(1)","hiu5":"9992(1)","tsong1":"9996(1)","tshat8":"10055(1)","tio5":"10056(1)","jiah4":"10058(1)","kha1":"10059(1)","tsuainn7":"10060(1)","kui7":"10061(1)","loo7":"10136(1)","thiau3":"10137(1)","gu7":"10144(1)","un7":"10146(1)","pian3":"10147(1)","at4":"10150(1)","hia5":"10151(1)","hiah4":"10152(1)","tshing3":"10256(1)","tsah8":"10257(1)","lui5":"10280(1)","phauh8":"10281(1)","tian7":"10283(1)","pa2":"10287(1)","khun1":"10288(1)","tiann2":"10354(1)","tshi2":"10356(1)","hiau1":"10374(1)","oh4":"10375(1)","uih8":"10376(1)","ia3":"10377(1)","tsak8":"10379(1)","ma7":"10384(1)","kinn5":"10413(1)","tuat8":"10417(1)","pu7":"10437(1)","kua2":"10438(1)","tsat8":"10439(1)","tui3":"10442(1)","mua1":"10444(1)","im3":"10446(1)","tso1":"10496(1)","tsham2":"10497(1)","siak4":"10499(1)","siang3":"10500(1)","tiah4":"10502(1)","tsang2":"10503(1)","khaunnh8":"10522(1)","tshik8":"10523(1)","bong1":"10524(1)","boo1":"10524(1)","tsham3":"10526(1)","phiat4":"10528(1)","khainn2":"10529(1)","kha3":"10530(1)","uat4":"10532(1)","me5":"10534(1)","thiong3":"10535(1)","tshing5":"10536(1)","thui5":"10558(1)","tshiunn1":"10559(1)","siam3":"10564(1)","tih4":"10565(1)","kun2":"10567(1)","buan2":"10568(1)","mua2":"10569(1)","phiau1":"10601(1)","tshat4":"10602(1)","au1":"10607(1)","au3":"10608(1)","han3":"10609(1)","suan7":"10610(1)","hannh4":"10613(1)","him5":"10645(1)","gi5":"10648(1)","tsin7":"10655(1)","kann1":"10656(1)","thng7":"10657(1)","hok4":"10661(1)","poh8":"10683(1)","sng3":"10684(1)","suan3":"10685(1)","kong2":"10687(1)","kuan2":"10688(1)","tu7":"10689(1)","tsang3":"10690(1)","tsiann1":"10691(1)","tue3":"10747(1)","kin2":"10751(1)","huat8":"10752(1)","thui2":"10753(1)","kue5":"10779(1)","hak4":"10783(1)","tshioh8":"10784(1)","sih8":"10803(1)","jin7":"10812(1)","lin7":"10812(1)","gi2":"10816(1)","gu2":"10816(1)","sueh4":"10822(1)","sia1":"10823(1)","kuann2":"10824(1)","so5":"10825(1)","seh8":"10852(1)","khin1":"10853(1)","liu3":"10855(1)","hng7":"10856(1)","uan2":"10857(1)","kann3":"10859(1)","phiann2":"10864(1)","gun5":"10865(1)","koh4":"10906(1)","khiah4":"10908(1)","tam3":"10914(1)","nia2":"10916(1)","hong7":"10920(1)","phinn7":"10938(1)","tse5":"10939(1)","tsue5":"10939(1)","tsiau5":"10940(1)","khiam7":"10959(1)","kiam3":"10962(1)","phok8":"10979(1)","phun3":"10980(1)","hiau5":"11002(1)","sim2":"11004(1)","sia2":"11005(1)","tsan3":"11007(1)","tsan5":"11008(1)","bio7":"11011(1)","tuann5":"11015(1)","iann2":"11017(1)","tshueh4":"11050(1)","iu1":"11051(1)","pih4":"11053(1)","nua2":"11055(1)","ngiau2":"11059(1)","lian2":"11060(1)","kiau7":"11062(1)","giah4":"11063(1)","tshiau5":"11098(1)","lio5":"11100(1)","tshok4":"11104(1)","siau3":"11105(1)","tsiam7":"11107(1)","tso5":"11109(1)","gak8":"11110(1)","piau1":"11150(1)","pio1":"11151(1)","boo5":"11154(1)","iunn7":"11155(1)","phuah4":"11157(1)","phun1":"11158(1)","siau5":"11184(1)","bun3":"11186(1)","ut4":"11189(1)","go5":"11190(1)","jiat8":"11203(1)","juah8":"11204(1)","jiau5":"11209(1)","puann5":"11210(1)","khap8":"11240(1)","tiu7":"11241(1)","king5":"11243(1)","khing5":"11245(1)","tshue5":"11247(1)","tshe5":"11247(1)","koo5":"11274(1)","thong7":"11277(1)","uan7":"11280(1)","lian7":"11281(1)","me7":"11283(1)","pa7":"11303(1)","mooh8":"11305(1)","phoo3":"11308(1)","phong7":"11309(1)","tsia3":"11323(1)","tshang1":"11324(1)","lian1":"11325(1)","po1":"11349(1)","pue3":"11350(1)","tsui5":"11351(1)","kho3":"11352(1)","tam5":"11355(1)","tshiann2":"11380(1)","tsenn3":"11382(1)","tu1":"11384(1)","siunn2":"11387(1)","tsian7":"11392(1)","tah8":"11395(1)","lun5":"11478(1)","tsia1":"11480(1)","jia1":"11482(1)","lia1":"11482(1)","tsui3":"11486(1)","tshoo3":"11487(1)","giap4":"11513(1)","phoo1":"11515(1)","lang3":"11516(1)","tan5":"11528(1)","ue5":"11531(1)","uann1":"11532(1)","go7":"11536(1)","nau7":"11565(1)","gam7":"11591(1)","ging5":"11592(1)","aih4":"11604(1)","piah4":"11605(1)","ing3":"11606(1)","hak8":"11608(1)","oh8":"11609(1)","pin5":"11637(1)","tsian3":"11640(1)","ham2":"11641(1)","tik8":"11643(1)","tiak8":"11644(1)","tsho1":"11647(1)","iat8":"11653(1)","tshiu7":"11698(1)","lok4":"11700(1)","lop4":"11701(1)","kueh8":"11702(1)","huainn5":"11736(1)","huinn5":"11736(1)","pun5":"11737(1)","hiann5":"11769(1)","inn3":"11773(1)","thng3":"11775(1)","bun7":"11776(1)","bong3":"11778(1)","khue5":"11806(1)","khe5":"11806(1)","bua5":"11810(1)","inn2":"11812(1)","pin3":"11824(1)","ha5":"11829(1)","pak8":"11830(1)","kuan7":"11831(1)","phong3":"11857(1)","hing3":"11860(1)","lui2":"11861(1)","tshin1":"11901(1)","gioh8":"11904(1)","niau1":"11905(1)","lua7":"11907(1)","phin5":"11908(1)","tue5":"11909(1)","nua3":"11946(1)","suan2":"11949(1)","tshenn2":"11952(1)","tshinn2":"11952(1)","tshann7":"11987(1)","tsinn5":"11988(1)","iam1":"11991(1)","hiam2":"11993(1)","tsenn7":"11995(1)","tsing7":"11996(1)","siu3":"12030(1)","thau5":"12031(1)","am7":"12032(1)","ann7":"12033(1)","thun5":"12090(1)","hann2":"12124(1)","heh4":"12125(1)","tshiak8":"12126(1)","tioh4":"12143(1)","tong2":"12186(1)","suainn7":"12188(1)","sip4":"12203(1)","lam7":"12205(1)","iann5":"12206(1)","so3":"12208(1)","tshiunn5":"12211(1)","khuan5":"12226(1)","gam5":"12229(1)","lio2":"12232(1)","sian5":"12234(1)","sui7":"12241(1)","bih8":"12243(1)","muai5":"12244(1)","sam2":"12245(1)","pun3":"12246(1)","khng1":"12247(1)","phang7":"12249(1)","tsong2":"12252(1)","penn1":"12286(1)","pinn1":"12286(1)","tsan1":"12287(1)","siann1":"12290(1)","tshang3":"12292(1)","tam2":"12293(1)","ioh4":"12296(1)","hiam1":"12347(1)","tsi5":"12348(1)","khok4":"12367(1)","lian3":"12409(1)","song1":"12433(1)","liam5":"12447(1)","lut4":"12449(1)","thut4":"12450(1)","tiam2":"12451(1)","konn5":"12452(1)","huann5":"12453(1)","ge3":"12474(1)","tsim2":"12478(1)","thok4":"12479(1)","tan3":"12480(1)","ngiau1":"12483(1)","lu1":"12484(1)","tuan3":"12486(1)","tuan7":"12487(1)","tsuann7":"12508(1)","phiah8":"12517(1)","ang3":"12518(1)","phiah4":"12519(1)","sui1":"12543(1)","phun2":"12547(1)","khiau3":"12548(1)","phio5":"12554(1)","hiauh4":"12588(1)","gio5":"12592(1)","ngiauh8":"12593(1)","thang5":"12594(1)","thiong5":"12595(1)","tsim5":"12596(1)","hooh4":"12614(1)","tsam3":"12615(1)","nng3":"12618(1)","nng1":"12619(1)","tsuan2":"12620(1)","tsuan7":"12621(1)","tng2":"12622(1)","tsiunn3":"12651(1)","tin3":"12653(1)","siang1":"12655(1)","giah8":"12741(1)","hiah8":"12742(1)","iann7":"12745(1)","liu7":"12746(1)","khia5":"12747(1)","sang1":"12749(1)","phan1":"12770(1)","lang2":"12771(1)","long2":"12772(1)","phak8":"12773(1)","sih4":"12795(1)","gai7":"12797(1)","pua3":"12806(1)","tshiam1":"12807(1)","phoo7":"12810(1)","tsin5":"12811(1)","kian2":"12812(1)","ge7":"12834(1)","tin5":"12835(1)","ioh8":"12836(1)","than1":"12837(1)","ham3":"12865(1)","phoo2":"12868(1)","kio7":"12870(1)","kiann3":"12897(1)","kuinn1":"12900(1)","lan7":"12902(1)","guan7":"12925(1)","phian3":"12927(1)","honn1":"12941(1)","phiang7":"12942(1)","khuan3":"12946(1)","giam5":"12947(1)","jiang2":"12948(1)","kuan5":"12963(1)","ann5":"12964(1)","tshiam2":"12965(1)","lang1":"12966(1)","tshinn5":"12967(1)","nua7":"12968(1)","le3":"12987(1)","bang2":"13007(1)","tak4":"13008(1)","phih4":"13010(1)","kiam5":"13052(1)","mi7":"13053(1)","uang1":"13084(1)","liap4":"13086(1)","nua5":"13088(1)","tsang5":"13089(1)","tinn5":"13114(1)","lan5":"13115(1)","lah8":"13116(1)","bueh8":"13117(1)","thih4":"13130(1)","hiang2":"13168(1)","hoh8":"13171(1)","lo7":"13188(1)","long1":"13190(1)","tshuan5":"13193(1)","thuann1":"13194(1)","nng5":"13212(1)","thah8":"13213(1)","thiap8":"13214(1)","gian3":"13216(1)","lam1":"13218(1)","tiah8":"13224(1)","thiann1":"13225(1)","thing3":"13226(1)","thak8":"13227(1)","thok8":"13228(1)","pio7":"13253(1)","tsak4":"13255(1)","liong3":"13273(1)","lu3":"13274(1)","hiann2":"13276(1)","giam7":"13277(1)","kiann1":"13278(1)","tshue2":"13280(1)","the2":"13281(1)","iam5":"13354(1)","giang3":"13356(1)","thio3":"13376(1)","phan3":"13381(1)","neh4":"13383(1)","nih4":"13383(1)","tshim5":"13384(1)","sai5":"13385(1)","tsan2":"13397(1)","tsng3":"13402(1)","gong7":"13412(1)","tshak8":"13413(1)","lo3":"13449(1)","siam1":"13460(1)","khiap4":"13461(1)","mooh4":"13467(1)","gau5":"13471(1)","uainn2":"13479(1)","phue2":"13481(1)","tshih4":"13484(1)","kan2":"13502(1)","bai2":"13516(1)","siann7":"13534(1)","tshoh4":"13538(1)","too3":"13539(1)","the7":"13546(1)","khiu7":"13551(1)","mau1":"13553(1)","khat4":"13554(1)","tsann7":"13556(1)","thun2":"13572(1)","siunn5":"13575(1)","sim3":"13576(1)","tshim2":"13578(1)","gan3":"13580(1)","hiu3":"13583(1)","han5":"13586(1)","siang7":"13588(1)","lap4":"13600(1)","tshenn3":"13603(1)","tshinn3":"13603(1)","ne1":"13609(1)","hmh4":"14374(1)","lau1":"14512(1)","bang3":"15312(1)","tsann2":"15756(1)","tsuah8":"16960(1)","siau7":"17113(1)","jiang7":"28264(1)","giang7":"28264(1)","long7":"29805(1)"};
+
+// 詞彙 → 台羅音節 key 陣列（26 景點 + 26 詞彙全覆蓋）
+const wordSyllableMap = {
+    // === 景點名稱 ===
+    '故宮':       ['koo3', 'kiong1'],
+    '科博館':     ['kho1', 'phok4', 'kuan2'],
+    '海生館':     ['hai2', 'sing1', 'kuan2'],
+    '奇美博物館': ['ki5', 'bi2', 'phok4', 'but8', 'kuan2'],
+    '臺灣博物館': ['tai5', 'uan5', 'phok4', 'but8', 'kuan2'],
+    '蘭陽博物館': ['lan5', 'iunn5', 'phok4', 'but8', 'kuan2'],
+    '史前館':     ['su2', 'tsing5', 'kuan2'],
+    '科工館':     ['kho1', 'kang1', 'kuan2'],
+    '國美館':     ['kok4', 'bi2', 'kuan2'],
+    '海科館':     ['hai2', 'kho1', 'kuan2'],
+    '十三行':     ['tsap8', 'sann1', 'hang5'],
+    '黃金博物館': ['ng5', 'kim1', 'phok4', 'but8', 'kuan2'],
+    '北美館':     ['pak4', 'bi2', 'kuan2'],
+    '高美館':     ['ko1', 'bi2', 'kuan2'],
+    '陶瓷博物館': ['ing1', 'ko1', 'to5', 'hui5', 'phok4', 'but8', 'kuan2'],
+    '科教館':     ['kho1', 'kau3', 'kuan2'],
+    '當代藝術館': ['tong3', 'tai7', 'ge7', 'sut8', 'kuan2'],
+    '郵政博物館': ['iu5', 'tsing3', 'phok4', 'but8', 'kuan2'],
+    '歷史博物館': ['lik8', 'su2', 'phok4', 'but8', 'kuan2'],
+    '茶業博物館': ['te5', 'giap8', 'phok4', 'but8', 'kuan2'],
+    '泰雅博物館': ['thai3', 'ia2', 'phok4', 'but8', 'kuan2'],
+    '橫山書法藝術館': ['hing5', 'san1', 'su1', 'huat4', 'bi2', 'sut8', 'kuan2'],
+    '橫山書法館':   ['hing5', 'san1', 'su1', 'huat4', 'kuan2'],
+    '大溪木藝館': ['tai7', 'khe1', 'bok8', 'gi7', 'kuan2'],
+    '玻璃工藝館': ['poo7', 'le5', 'kang1', 'gi7', 'kuan2'],
+    '影像紀念館': ['ing2', 'siong7', 'ki3', 'liam7', 'kuan2'],
+    '客家文化館': ['kheh4', 'ka1', 'bun5', 'hua3', 'kuan2'],
+    '木雕博物館': ['bok8', 'tiau1', 'phok4', 'but8', 'kuan2'],
+    '台灣玻璃館': ['tai5', 'uan5', 'poo7', 'le5', 'kuan2'],
+    '中台世界博物館': ['tiong1', 'tai5', 'se3', 'kai3', 'phok4', 'but8', 'kuan2'],
+    '工藝園區':   ['kang1', 'gi7', 'hng5', 'khu1'],
+    '布袋戲館':   ['poo1', 'te7', 'hi3', 'kuan2'],
+    '故宮南院':   ['koo3', 'kiong1', 'lam5', 'inn7'],
+    '嘉美館':     ['ka1', 'bi2', 'kuan2'],
+    '美術館二館': ['bi2', 'sut8', 'kuan2', 'ji7', 'kuan2'],
+    '高史博':     ['ka1', 'hiong5', 'lik8', 'su2', 'phok4', 'but8', 'kuan2'],
+    '屏東菸廠':   ['pin5', 'tong1', 'ian1', 'tshiann3'],
+    '傳藝中心':   ['thuan5', 'ge7', 'tiong1', 'sim1'],
+    '石雕博物館': ['tsioh8', 'tiau1', 'phok4', 'but8', 'kuan2'],
+    '澎湖生博館': ['phenn5', 'oo5', 'sing1', 'uah8', 'phok4', 'but8', 'kuan2'],
+    '金門民俗館': ['kim1', 'bun5', 'bin5', 'siok8', 'kuan2'],
+    '馬祖民俗館': ['ma2', 'tsoo2', 'bin5', 'siok8', 'kuan2'],
+    '赤崁樓':     ['tshiah4', 'kham2', 'lau5'],
+    '孔廟':       ['khong2', 'bio7'],
+    '億載金城':   ['it4', 'tai7', 'kim1', 'siann5'],
+    '延平郡王祠': ['ian5', 'ping5', 'kun7', 'ong5', 'su5'],
+    '五妃廟':     ['goo7', 'hui1', 'bio7'],
+    '大天后宮':   ['tai7', 'thian1', 'hoo7', 'kiong1'],
+    '祀典武廟':   ['su7', 'tian2', 'bu2', 'bio7'],
+    '林百貨':     ['lim5', 'pah4', 'hue3'],
+    '左鎮化石園區': ['tso2', 'tin3', 'hua3', 'sio3', 'hng5', 'khu1'],
+    '南科考古館':   ['lam5', 'kho1', 'khau2', 'koo2', 'kuan2'],
+    '臺灣歷史博物館': ['tai5', 'uan5', 'lik8', 'su2', 'phok4', 'but8', 'kuan2'],
+    '臺灣文學館':   ['tai5', 'uan5', 'bun5', 'ha̍k8', 'kuan2'],
+    '野柳':       ['ia2', 'liu2'],
+    '陽明山':     ['iunn5', 'bing5', 'suann1'],
+    '太魯閣':     ['thai3', 'loo2', 'koh4'],
+    '清水斷崖':   ['tshing1', 'tsui2', 'tuan7', 'gai5'],
+    '日月潭':     ['jit8', 'guat8', 'tham5'],
+    '濁水溪':     ['lo5', 'tsui2', 'khe1'],
+    '龜山島':     ['ku1', 'suann1', 'to2'],
+    '玉山':       ['giok8', 'suann1'],
+    '阿里山':     ['a1', 'li2', 'suann1'],
+    '高美濕地':   ['ko1', 'bi2', 'sip8', 'te7'],
+    '十分瀑布':   ['sip8', 'hun1', 'phak8', 'poo1'],
+    '愛河':       ['ai3', 'ho5'],
+    '墾丁':       ['khun2', 'ting1'],
+    '澎湖':       ['phenn5', 'oo5'],
+    '蘭嶼':       ['lan5', 'su7'],
+    '綠島':       ['lik8', 'to2'],
+    '小琉球':     ['sio2', 'liu5', 'kiu5'],
+    '九份':       ['kau2', 'hun7'],
+    '淡水':       ['tam1', 'tsui2'],
+    '安平古堡':   ['an1', 'ping5', 'koo2', 'po2'],
+    '駁二藝術特區': ['phak4', 'ji7', 'ge7', 'sut8', 'tik8', 'khu1'],
+    '蓮池潭':     ['lian5', 'ti5', 'tham5'],
+    '西子灣':     ['se1', 'tsu2', 'uan5'],
+    '大鵬灣':     ['tai7', 'ping5', 'uan5'],
+    '四重溪溫泉': ['su3', 'tiong5', 'khe1'],
+    '雙流森林':   ['siang1', 'liu5', 'sen1', 'lim5'],
+    '萬金聖堂':   ['ban7', 'kim1', 'sing3', 'bu2', 'tong5'],
+    '萬金聖母聖殿': ['ban7', 'kim1', 'sing3', 'bu2', 'sing3', 'tian7'],
+    '山川吊橋':   ['suann1', 'tshing1', 'tiau7', 'kio5'],
+    '山川琉璃吊橋': ['san1', 'tshuan1', 'liu5', 'li5', 'tiau7', 'kio5'],
+    '高流':       ['ko1', 'hiong5', 'liu5', 'hing5', 'im1', 'ge7', 'tiong1', 'sim1'],
+    '衛武營':     ['ue7', 'bu2', 'inn5'],
+    '糖廠':       ['kiau5', 'thau5', 'thng5', 'tshiann3'],
+    '佛光山':     ['hut8', 'kong1', 'suann1'],
+    '美濃客家庄': ['bi2', 'nong5'],
+    '舊鐵橋':     ['tua7', 'tshiu7', 'ku7', 'thih4', 'kio5'],
+    '壽山':       ['siu7', 'suann1'],
+    '旗津':       ['ki5', 'tsin1'],
+    '鵝鑾鼻燈塔': ['go5', 'lan5', 'pi7', 'ting1', 'thah4'],
+    '勝利星村':   ['sing3', 'li7', 'sing1', 'tshuan1'],
+    // === 詞彙 ===
+    '山':   ['suann1'],
+    '溪':   ['khe1'],
+    '河':   ['ho5'],
+    '潭':   ['tham5'],
+    '海':   ['hai2'],
+    '島':   ['to2'],
+    '樹仔': ['tshiu7', 'a2'],
+    '溫泉': ['un1', 'tsuan5'],
+    '龜':   ['ku1'],
+    '魚':   ['hi5'],
+    '峽谷': ['kiap4', 'kok4'],
+    '石頭': ['tsioh8', 'thau5'],
+    '雪':   ['seh4'],
+    '寶物': ['po2', 'but8'],
+    '恐龍': ['khiong2', 'liong5'],
+    '鯊魚': ['sua1', 'hi5'],
+    '博物館': ['phok4', 'but8', 'kuan2'],
+    '瀑布': ['phak8', 'poo1'],
+    '老街': ['lau7', 'ke1'],
+    '古堡': ['koo2', 'po2'],
+    '燈塔': ['ting1', 'thah4'],
+    '濕地': ['sip8', 'te7'],
+    '夜市': ['ia7', 'tshi7'],
+    '廟':   ['bio7'],
+    '珊瑚': ['san1', 'hoo5'],
+    '藝術': ['ge7', 'sut8'],
+    '化石': ['hua3', 'sio3'],
+    '石器': ['tsioh8', 'khi3'],
+    '科學': ['kho1', 'ha̍k8'],
+    '香腸': ['hiong1', 'tshiong5'],
+    '歷史': ['lik8', 'su2'],
+    '文學': ['bun5', 'ha̍k8'],
+    '法律': ['huat4', 'lut8'],
+    '建築': ['kian3', 'tiok4'],
+    '噶瑪蘭': ['kat4', 'ma2', 'lan5'],
+    '史前': ['su2', 'tsing5'],
+    '工藝': ['kang1', 'gi7'],
+    '美術': ['bi2', 'sut8'],
+    '科技': ['kho1', 'ki7'],
+    '考古': ['kho2', 'koo2'],
+    '黃金': ['hong5', 'kim1'],
+    '現代': ['hian7', 'tai7'],
+    '展覽': ['tian2', 'lam2'],
+    '陶瓷': ['to5', 'hui5'],
+    '教育': ['kho1', 'kau3'],
+    '當代': ['tong3', 'tai7'],
+    '郵政': ['iu5', 'tsing3'],
+    '茶業': ['te5', 'giap8'],
+    '泰雅': ['thai3', 'ia2'],
+    '書法': ['su1', 'huat4'],
+    '木藝': ['bok8', 'gi7'],
+    '玻璃': ['poo7', 'le5'],
+    '影像': ['ing2', 'siong7'],
+    '客家': ['kheh4', 'ka1'],
+    '木雕': ['bok8', 'tiau1'],
+    '世界': ['se3', 'kai3'],
+    '布袋戲': ['poo1', 'te7', 'hi3'],
+    '南院': ['lam5', 'inn7'],
+    '菸葉': ['iat8', 'tshiann3'],
+    '傳統': ['thuan5', 'thong2'],
+    '石雕': ['tsioh8', 'tiau1'],
+    '生活': ['sing1', 'uah8'],
+    '民俗': ['bin5', 'siok8'],
+    '城':   ['siann5'],
+    '儒學': ['ju5', 'hak8'],
+    '大砲': ['tai7', 'phau3'],
+    '忠臣': ['tiong1', 'sin5'],
+    '貞節': ['tsing1', 'tsiat4'],
+    '關帝': ['kuan1', 'te3'],
+    '媽祖': ['ma2', 'tsoo2'],
+    '百貨': ['pah4', 'hue3'],
+    '塔':   ['thah4'],
+    '渡輪': ['too7', 'lun5'],
+    '菩薩': ['phoo5', 'sat4'],
+    '猴':   ['kau5'],
+    '紙傘': ['tsua2', 'suann3'],
+    '鐵橋': ['thih4', 'kio5'],
+    '歌':   ['kua1'],
+    '歌劇':   ['kua1', 'kiok8'],
+    '甘蔗':   ['kam1', 'tsia3'],
+    '教堂':   ['kau3', 'tng5'],
+    '帆船': ['phan5', 'tsun5'],
+    '眷村': ['kun3', 'tshuan1'],
+    '芬多精': ['hun1', 'to1', 'tsing1'],
+    '教堂':   ['kau3', 'tng5'],
+    '吊橋':   ['tiau7', 'kio5'],
+
+    // === 全台二二八紀念公園與紀念碑（依自然詞群 Phrase Chunk 變調分組） ===
+    '基隆二二八紀念碑':         [['ki1', 'liong5'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '八堵站二二八紀念碑':       [['pat4', 'too2', 'tsam7'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '中央二二八紀念碑':         [['tiong1', 'ng1'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '二二八引爆地紀念碑':       [['ji7', 'ji7', 'pat4'], ['in2', 'pok8', 'te7'], ['ki3', 'liam7', 'pi1']],
+    '三重二二八紀念公園':       [['sam1', 'ting5'], ['ji7', 'ji7', 'pat4'], ['kong1', 'hng5']],
+    '淡水埔頂二二八紀念碑':     [['tam7', 'tsui2'], ['phoo1', 'ting2'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '桃園二二八紀念公園':       [['tho5', 'hng5'], ['ji7', 'ji7', 'pat4'], ['kong1', 'hng5']],
+    '新竹市二二八紀念碑':       [['sin1', 'tik4', 'tshi7'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '臺中市東峰二二八紀念碑':   [['tai5', 'tiong1', 'tshi7'], ['tang1', 'hong1'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '大里二二八紀念碑':         [['tai7', 'li2'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '靜宜大學二二八紀念碑':     [['tsing7', 'gi5'], ['tai7', 'hak8'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '彰化縣二二八紀念碑':       [['tsiong1', 'hua3', 'kuan7'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '烏牛欄戰役紀念碑':         [['oo1', 'gu5', 'lan5'], ['tsian3', 'ik8'], ['ki3', 'liam7', 'pi1']],
+    '竹山二二八紀念碑':         [['tik4', 'suann1'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '古坑二二八紀念碑':         [['koo2', 'khenn1'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '雲林縣二二八紀念碑':       [['hun5', 'lim5', 'kuan7'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '嘉義市二二八紀念碑':       [['ka1', 'gi7', 'tshi7'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '嘉義市二二八紀念公園碑':   [['ka1', 'gi7', 'tshi7'], ['ji7', 'ji7', 'pat4'], ['kong1', 'hng5', 'pi1']],
+    '嘉義二二八國家紀念公園':   [['ka1', 'gi7'], ['kok4', 'ka1'], ['ji7', 'ji7', 'pat4'], ['kong1', 'hng5']],
+    '阿里山二二八紀念碑':       [['a1', 'li2', 'suann1'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '臺南市二二八紀念公園':     [['tai5', 'lam5', 'tshi7'], ['ji7', 'ji7', 'pat4'], ['kong1', 'hng5']],
+    '新營二二八紀念碑':         [['sin1', 'iann5'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '岡山二二八和平紀念碑':     [['kong1', 'san1'], ['ji7', 'ji7', 'pat4'], ['ho5', 'ping5'], ['ki3', 'liam7', 'pi1']],
+    '壽山二二八和平紀念碑':     [['tsiu7', 'suann1'], ['ji7', 'ji7', 'pat4'], ['ho5', 'ping5'], ['ki3', 'liam7', 'pi1']],
+    '高雄市二二八和平紀念公園': [['ko1', 'hiong5', 'tshi7'], ['ji7', 'ji7', 'pat4'], ['ho5', 'ping5'], ['ki3', 'liam7'], ['kong1', 'hng5']],
+    '屏東公園二二八紀念碑':     [['pin5', 'tong1'], ['kong1', 'hng5'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '林邊二二八紀念碑':         [['na5', 'pinn1'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+    '宜蘭二二八紀念物':         [['gi5', 'lan5'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'but8']],
+    '花蓮關懷二二八紀念碑':     [['hua1', 'lian5'], ['kuan1', 'huainn5'], ['ji7', 'ji7', 'pat4'], ['ki3', 'liam7', 'pi1']],
+
+    // === 人權和平新詞彙 ===
+    '二二八': ['ji7', 'ji7', 'pat4'],
+    '和平': ['ho5', 'ping5'],
+    '人權': ['jin5', 'khuan5'],
+    '紀念': ['ki3', 'liam7'],
+    '民主': ['bin5', 'tsu2'],
+    '自由': ['tsu7', 'iu5'],
+    '真相': ['tsin1', 'siong3'],
+};
+
+// === 語音引擎狀態 ===
+let speechRate = 0.9;
+let activeAudio = null;
+let queueCancelToken = 0;
+
+const CDN_BASE = "https://chhoetaigi.github.io/KipSutianDataMirror/public/20260503-2330/imtong/sutiau";
+
+function cancelAudio() {
+    queueCancelToken++;
+    if (activeAudio) { activeAudio.pause(); activeAudio.currentTime = 0; activeAudio = null; }
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
+function updateBadge(mode) {
+    const badge = document.getElementById("speech-engine-badge");
+    if (!badge) return;
+    if (mode === "online") {
+        badge.textContent = isToneSandhiEnabled ? "🔊 實體台語 (連音變調)" : "🔊 實體台語 (字典本調)";
+        badge.className = "speech-badge badge-online";
+    } else {
+        badge.textContent = "🔇 離線語音備援";
+        badge.className = "speech-badge badge-offline";
+    }
+}
+
+// ===========================================================
+// 3.1 台語連音變調引擎 (Tone Sandhi Engine)
+// 參考與整合同作者專案：Taiwanese Lô-má-jī Tone Sandhi Tool (@史秀里冊房)
+// ===========================================================
+
+// 解析台羅音節字串（例如 'ji7', 'pat4', 'tshiu7', 'kua1'）
+function parseSyllableText(str) {
+    let s = str.toLowerCase().trim();
+    if (!s) return null;
+    let isNeutral = false;
+    if (s.startsWith('--')) {
+        isNeutral = true;
+        s = s.slice(2);
+    }
+    let tone = null;
+    const matchDigit = s.match(/([1-8])$/);
+    if (matchDigit) {
+        tone = parseInt(matchDigit[1]);
+        s = s.slice(0, -1);
+    } else {
+        const nfd = s.normalize('NFD');
+        if (nfd.includes('\u0301') || /[áéíóúḿń]/.test(s)) tone = 2;
+        else if (nfd.includes('\u0300') || /[àèìòùǹ]/.test(s)) tone = 3;
+        else if (nfd.includes('\u0302') || /[âêîôû]/.test(s)) tone = 5;
+        else if (nfd.includes('\u0304') || /[āēīōū]/.test(s)) tone = 7;
+        else if (nfd.includes('\u030d') || s.includes('̍')) tone = 8;
+    }
+    let base = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC');
+    base = base.replace(/o͘/g, 'oo').replace(/o•/g, 'oo').replace(/ⁿ/g, 'nn');
+    if (tone === null) {
+        if (base.endsWith('p') || base.endsWith('t') || base.endsWith('k') || base.endsWith('h')) {
+            tone = 4;
+        } else {
+            tone = 1;
+        }
+    }
+    const initials = ['tsh', 'ts', 'kh', 'ph', 'th', 'ng', 'ch', 'chh', 'b', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 's', 't'];
+    let initial = '';
+    let rhymePart = base;
+    for (let init of initials) {
+        if (base.startsWith(init)) {
+            initial = init;
+            rhymePart = base.slice(init.length);
+            break;
+        }
+    }
+    if (initial === 'ch') initial = 'ts';
+    if (initial === 'chh') initial = 'tsh';
+    return { initial, rhyme: rhymePart, tone, isNeutral };
+}
+
+// 教育部標準優勢腔連音變調公式計算
+function calculateSandhiSyllable(initial, rhyme, tone) {
+    let sandhiInitial = initial;
+    let sandhiRhyme = rhyme;
+    let sandhiTone = tone;
+    let ruleDesc = '';
+    
+    switch(parseInt(tone)) {
+        case 1:
+            sandhiTone = 7;
+            ruleDesc = '1 ➔ 7 (高平➔中平)';
+            break;
+        case 2:
+            sandhiTone = 1;
+            ruleDesc = '2 ➔ 1 (高降➔高平)';
+            break;
+        case 3:
+            sandhiTone = 2;
+            ruleDesc = '3 ➔ 2 (低降➔高降)';
+            break;
+        case 4:
+            if (rhyme.endsWith('h')) {
+                sandhiRhyme = rhyme.slice(0, -1);
+                sandhiTone = 2;
+                ruleDesc = '4(-h) ➔ 2 (喉塞音脫落變高降)';
+            } else {
+                sandhiTone = 8;
+                ruleDesc = '4(-p/-t/-k) ➔ 8 (塞音變高入)';
+            }
+            break;
+        case 5:
+            sandhiTone = 7;
+            ruleDesc = '5 ➔ 7 (低升➔中平)';
+            break;
+        case 7:
+            sandhiTone = 3;
+            ruleDesc = '7 ➔ 3 (中平➔低降)';
+            break;
+        case 8:
+            if (rhyme.endsWith('h')) {
+                sandhiRhyme = rhyme.slice(0, -1);
+                sandhiTone = 3;
+                ruleDesc = '8(-h) ➔ 3 (喉塞音脫落變低降)';
+            } else {
+                sandhiTone = 4;
+                ruleDesc = '8(-p/-t/-k) ➔ 4 (塞音變低入)';
+            }
+            break;
+    }
+    return { sandhiInitial, sandhiRhyme, sandhiTone, ruleDesc };
+}
+
+// 查詢真人發音音檔 ID（多重回退：精準變調 ➔ 漳泉自由音變 ➔ 原字本調 ➔ 任意聲調）
+function getAudioId(initial, rhyme, targetTone, baseTone) {
+    let base = (initial + rhyme).toLowerCase();
+    base = base.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC');
+    base = base.replace(/o͘/g, 'oo').replace(/o•/g, 'oo').replace(/ⁿ/g, 'nn');
+    
+    // 支援漳泉自由音變（如 j <-> l: ji/li）
+    const baseVariants = [base];
+    if (base.startsWith('j')) baseVariants.push('l' + base.slice(1));
+    else if (base.startsWith('l')) baseVariants.push('j' + base.slice(1));
+    
+    // 1. 目標調（變調）精確查詢
+    for (const b of baseVariants) {
+        if (syllableAudioMap[b + targetTone]) {
+            return { id: syllableAudioMap[b + targetTone], match: 'target', key: b + targetTone };
+        }
+    }
+    
+    // 2. 本字本調回退查詢
+    if (baseTone) {
+        for (const b of baseVariants) {
+            if (syllableAudioMap[b + baseTone]) {
+                return { id: syllableAudioMap[b + baseTone], match: 'base_fallback', key: b + baseTone };
+            }
+        }
+    }
+    
+    // 3. 任意聲調回退查詢
+    for (const b of baseVariants) {
+        for (const t of [1, 2, 3, 5, 7, 8, 4]) {
+            if (syllableAudioMap[b + t]) {
+                return { id: syllableAudioMap[b + t], match: 'any_fallback', key: b + t };
+            }
+        }
+    }
+    return null;
+}
+
+// 連音變調開關狀態（預設開啟道地連音變調）
+let isToneSandhiEnabled = localStorage.getItem('tw_sandhi_enabled') !== 'false';
+
+function toggleToneSandhi() {
+    isToneSandhiEnabled = !isToneSandhiEnabled;
+    localStorage.setItem('tw_sandhi_enabled', isToneSandhiEnabled);
+    updateSandhiToggleBtn();
+    const badge = document.getElementById('speech-engine-badge');
+    if (badge) {
+        badge.textContent = isToneSandhiEnabled ? "🔊 實體台語 (連音變調)" : "🔊 實體台語 (字典本調)";
+    }
+}
+
+function updateSandhiToggleBtn() {
+    const btn = document.getElementById('sandhi-toggle-btn');
+    if (!btn) return;
+    if (isToneSandhiEnabled) {
+        btn.className = "filter-btn active";
+        btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> 連音變調：開`;
+        btn.title = "目前為道地口語「連音變調」模式，點擊切換為單字本調";
+    } else {
+        btn.className = "filter-btn";
+        btn.innerHTML = `<i class="fa-solid fa-book"></i> 字典本調：開`;
+        btn.title = "目前為字典「單字本調」模式，點擊切換為連音變調";
+    }
+}
+
+// 計算詞彙整組變調音檔序列（支援扁平陣列、4字2+2複合詞、詞群陣列）
+function computeSandhiAudioSequence(syllables, enableSandhi = true) {
+    if (!Array.isArray(syllables) || syllables.length === 0) return [];
+    
+    const chunks = [];
+    if (Array.isArray(syllables[0])) {
+        // 已有自然詞群分組（如基隆-二二八-紀念碑）
+        syllables.forEach(c => chunks.push(c));
+    } else if (syllables.length === 4) {
+        // 標準 4 字 2+2 複合詞結構（如 億載-金城、赤崁-古樓）
+        chunks.push([syllables[0], syllables[1]]);
+        chunks.push([syllables[2], syllables[3]]);
+    } else {
+        chunks.push(syllables);
+    }
+    
+    const audioIds = [];
+    const debugFlow = [];
+
+    chunks.forEach(chunk => {
+        const N = chunk.length;
+        chunk.forEach((s, idx) => {
+            const parsed = parseSyllableText(s);
+            if (!parsed) return;
+            let targetTone = parsed.tone;
+            let rhyme = parsed.rhyme;
+            let initial = parsed.initial;
+            let ruleDesc = 'base';
+            
+            // 變調規則：同一詞群中，非末字全部變調；末字維持本調
+            if (enableSandhi && idx < N - 1) {
+                const sandhi = calculateSandhiSyllable(initial, rhyme, parsed.tone);
+                targetTone = sandhi.sandhiTone;
+                rhyme = sandhi.sandhiRhyme;
+                initial = sandhi.sandhiInitial;
+                ruleDesc = sandhi.ruleDesc;
+            }
+            
+            const audioObj = getAudioId(initial, rhyme, targetTone, parsed.tone);
+            if (audioObj && audioObj.id) {
+                audioIds.push(audioObj.id);
+            } else {
+                audioIds.push(null);
+            }
+            debugFlow.push(`${s}➔${initial}${rhyme}${targetTone}(${ruleDesc})`);
+        });
+    });
+
+    console.log(`[ToneSandhi] ${enableSandhi ? '連音變調' : '字典本調'} 轉換流:`, debugFlow.join(' '));
+    return audioIds;
+}
+
+// 音節序列播放器（逐音節串接，自然形成詞語發音）
+function playAudioSequence(audioIds) {
+    const token = ++queueCancelToken;
+    if (activeAudio) { activeAudio.pause(); activeAudio = null; }
+    let idx = 0;
+
+    function playNext() {
+        if (token !== queueCancelToken) return;
+        if (idx >= audioIds.length) return;
+        const id = audioIds[idx];
+        if (!id) { idx++; playNext(); return; }
+        const audio = new Audio(`${CDN_BASE}/${id}.mp3`);
+        activeAudio = audio;
+        audio.playbackRate = speechRate;
+        audio.onended = () => { idx++; playNext(); };
+        audio.onerror  = () => { idx++; playNext(); };
+        audio.play().catch(() => { idx++; playNext(); });
+    }
+    playNext();
+}
+
+// 主要 TTS 函式：音節序列（連音變調） ➔ 終極備援 Web Speech API
+function playTaigiTTS(text) {
+    cancelAudio();
+    const cleanText = text.replace(/[【】()（）]/g, '').trim();
+    const syllableKeys = wordSyllableMap[cleanText];
+
+    if (syllableKeys && syllableKeys.length > 0) {
+        // 套用台語連音變調引擎
+        const audioIds = computeSandhiAudioSequence(syllableKeys, isToneSandhiEnabled);
+        const hasAny = audioIds.some(id => id !== null);
+        if (hasAny) {
+            updateBadge("online");
+            playAudioSequence(audioIds);
+            return;
+        }
+    }
+    // 終極備援：Web Speech API
+    playOfflineVoiceFallback(cleanText);
+}
+
+function playOfflineVoiceFallback(text) {
+    if (!('speechSynthesis' in window)) return;
+    updateBadge("offline");
+    window.speechSynthesis.cancel();
+    const voices = window.speechSynthesis.getVoices();
+    let voice = voices.find(v => v.lang.includes("nan") || v.name.includes("Mei-Jia") || v.name.includes("Taiwanese"));
+    const useNan = !!voice;
+    if (!voice) voice = voices.find(v => v.lang.includes("zh-TW"));
+    if (voice && useNan) updateBadge("online");
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang  = useNan ? "nan" : "zh-TW";
+    utterance.rate  = speechRate;
+    if (voice) utterance.voice = voice;
+    window.speechSynthesis.speak(utterance);
+}
+
+function updateSpeechRate(val) {
+    speechRate = parseFloat(val);
+    localStorage.setItem("tw_speech_rate", speechRate);
+}
+function updateRateLabel(val) {
+    document.getElementById("speech-rate-label").textContent = `${parseFloat(val).toFixed(1)}x`;
+}
+
+// 確保 voices 載入
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
+
+// ===========================================================
+// 4. App 狀態與初始化
+// ===========================================================
+let currentLocId = 'npm';
+
+window.onload = () => {
+    // 載入 localStorage 設定
+    updateSandhiToggleBtn();
+    if (localStorage.getItem("tw_theme") === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+        document.querySelector("#theme-toggle-btn i").className = "fa-solid fa-sun";
+    }
+    const savedRate = localStorage.getItem("tw_speech_rate");
+    if (savedRate) {
+        speechRate = parseFloat(savedRate);
+        const slider = document.getElementById("speech-rate");
+        slider.value = speechRate;
+        document.getElementById("speech-rate-label").textContent = `${speechRate.toFixed(1)}x`;
+    }
+
+    initCountyDropdowns();
+    renderLocationList();
+    loadLocationDetail('npm');
+    renderVocabWall();
+    
+    // 初始化縣市面板
+    document.getElementById("county-stats-container").style.display = "block";
+    document.getElementById("county-select").style.display = "block";
+    renderCountyStats();
+};
+
+// ===========================================================
+// 5. Tab 導航
+// ===========================================================
+function switchTab(tabId) {
+    document.querySelectorAll(".tab-trigger").forEach(btn => btn.classList.remove("active"));
+    document.getElementById(`tab-${tabId}-btn`).classList.add("active");
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    document.getElementById(`panel-${tabId}`).classList.add("active");
+    if (tabId === 'map') {
+        setTimeout(() => { renderMap(); if (_leafletMap) _leafletMap.invalidateSize(); }, 50);
+    }
+}
+
+// ===========================================================
+// 6. 深色模式切換
+// ===========================================================
+function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("tw_theme", next);
+    document.querySelector("#theme-toggle-btn i").className = next === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+}
+
+// ===========================================================
+// 7. 景點探索
+// ===========================================================
+function renderLocationList(filterCounty = 'all') {
+    const container = document.getElementById("location-list");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const filtered = filterCounty === 'all'
+        ? locations
+        : locations.filter(l => l.county === filterCounty);
+
+    const countEl = document.getElementById("loc-list-count");
+    if (countEl) countEl.textContent = `${filtered.length} 個景點`;
+
+    filtered.forEach(loc => {
+        const btn = document.createElement("button");
+        btn.className = `loc-btn ${loc.id === currentLocId ? 'active' : ''}`;
+        btn.id = `btn-loc-${loc.id}`;
+        btn.onclick = () => {
+            document.querySelectorAll("#location-list .loc-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            loadLocationDetail(loc.id);
+        };
+        btn.innerHTML = `<span class="loc-icon">${loc.icon}</span><span style="flex:1;"><strong>${loc.nameZH}</strong> <small style="opacity:0.8;">${loc.nameEN}</small></span><span style="font-size:0.75rem; color:var(--text-light);">${loc.county}</span>`;
+        container.appendChild(btn);
+    });
+}
+
+function filterExploreList(county) {
+    renderLocationList(county);
+    const filtered = county === 'all' ? locations : locations.filter(l => l.county === county);
+    if (filtered.length > 0 && !filtered.some(l => l.id === currentLocId)) {
+        loadLocationDetail(filtered[0].id);
+    }
+}
+
+function initCountyDropdowns() {
+    const counts = {};
+    locations.forEach(l => { counts[l.county] = (counts[l.county] || 0) + 1; });
+    const sorted = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+
+    const exploreSelect = document.getElementById("explore-county-filter");
+    const vocabSelect = document.getElementById("county-select");
+
+    if (exploreSelect) {
+        exploreSelect.innerHTML = '<option value="all">所有縣市 All Counties (' + locations.length + ')</option>';
+        sorted.forEach(c => {
+            exploreSelect.innerHTML += `<option value="${c}">${c} (${counts[c]})</option>`;
+        });
+    }
+
+    if (vocabSelect) {
+        vocabSelect.innerHTML = '<option value="all">所有縣市 All Counties</option>';
+        sorted.forEach(c => {
+            vocabSelect.innerHTML += `<option value="${c}">${c} (${counts[c]})</option>`;
+        });
+    }
+}
+
+function loadLocationDetail(id) {
+    currentLocId = id;
+
+    const loc = locations.find(l => l.id === id);
+    if (!loc) return;
+    document.getElementById("loc-title").textContent = loc.nameEN;
+    document.getElementById("loc-pinyin").textContent = `${loc.pinyin} (${loc.nameZH})`;
+    document.getElementById("loc-vocab").innerHTML = `<i class="fa-solid fa-lightbulb"></i> 台語關鍵詞: ${loc.vocab}`;
+    document.getElementById("loc-desc").textContent = loc.desc;
+
+    // 同步左側景點列表高亮
+    document.querySelectorAll("#location-list .loc-btn").forEach(b => {
+        b.classList.toggle('active', b.id === `btn-loc-${id}`);
+    });
+
+    // 同步地圖 marker 高亮
+    if (window._leafletMarkers) {
+        window._leafletMarkers.forEach((m, mid) => {
+            const el = m.getElement();
+            if (el) el.classList.toggle('marker-active', mid === id);
+        });
+    }
+}
+
+function playCurrentLocationAudio() {
+    const loc = locations.find(l => l.id === currentLocId);
+    playTaigiTTS(loc.nameZH);
+}
+
+// ===========================================================
+// 8. 台灣 Leaflet 互動地圖
+// ===========================================================
+let _leafletMap = null;
+window._leafletMarkers = new Map();
+
+function renderMap() {
+    if (_leafletMap) return; // already initialised
+    _leafletMap = L.map('leaflet-map', {
+        center: [23.6, 120.9],
+        zoom: 7,
+        minZoom: 6,
+        maxZoom: 16,
+        zoomControl: true
+    });
+
+    // 官方台灣通用電子地圖 (NLSC 內政部國土測繪中心) - 完全免 API Key、永久開放免費
+    const nlscLayer = L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', {
+        attribution: '&copy; <a href="https://maps.nlsc.gov.tw/" target="_blank">內政部國土測繪中心 NLSC</a>',
+        maxZoom: 19
+    });
+
+    // ESRI 世界地形圖 (備用圖資)
+    const esriTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '&copy; <a href="https://www.esri.com/" target="_blank">Esri</a>',
+        maxZoom: 19
+    });
+
+    nlscLayer.addTo(_leafletMap);
+
+    L.control.layers({
+        '🇹🇼 台灣通用電子地圖 (NLSC)': nlscLayer,
+        '🌏 世界地形圖 (Esri Topo)': esriTopo
+    }, null, { position: 'topright' }).addTo(_leafletMap);
+
+    // Colour palette for marker pins by type
+    const typeColor = {
+        Museum:'#00827F', Coast:'#0984E3', Volcano:'#E17055', Canyon:'#6C5CE7',
+        Cliff:'#74B9FF', Lake:'#00CEC9', River:'#55EFC4', Mountain:'#636E72',
+        Forest:'#27AE60', Wetland:'#00B894', Waterfall:'#0097A7', Beach:'#FDCB6E',
+        Island:'#FD79A8', Archipelago:'#A29BFE', 'Old Street':'#E84393',
+        Historical:'#D63031', Historic:'#C0392B', Art:'#8E44AD', Memorial:'#2C3E50', default:'#00827F'
+    };
+
+    locations.forEach(loc => {
+        const color = typeColor[loc.type] || typeColor.default;
+        const isActive = loc.id === currentLocId;
+
+        const iconHtml = `<div class="marker-pin${isActive ? ' active-pin' : ''}" style="background:${color}">
+            <span class="pin-inner">${loc.icon}</span></div>`;
+        const divIcon = L.divIcon({
+            html: iconHtml, className: isActive ? 'map-marker-icon marker-active' : 'map-marker-icon',
+            iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -36]
+        });
+
+        const marker = L.marker([loc.lat, loc.lng], { icon: divIcon }).addTo(_leafletMap);
+
+        // Build popup content
+        const popupHTML = `
+            <div>
+                <div class="map-popup-title">${loc.icon} ${loc.nameEN}</div>
+                <div class="map-popup-pinyin">${loc.pinyin} &nbsp;·&nbsp; ${loc.nameZH}</div>
+                <span class="map-popup-vocab">💡 ${loc.vocab}</span>
+                <div class="map-popup-desc">${loc.desc.length > 160 ? loc.desc.slice(0,157)+'…' : loc.desc}</div>
+                <button class="map-popup-play" onclick="mapPlayAudio('${loc.nameZH}')">
+                    🔊 播放台語發音
+                </button>
+            </div>`;
+
+        marker.bindPopup(popupHTML, { maxWidth: 290, minWidth: 230 });
+        marker.on('click', () => {
+            loadLocationDetail(loc.id); // sync sidebar highlight only, no tab switch
+        });
+
+        window._leafletMarkers.set(loc.id, marker);
+    });
+
+    // Render county quick-zoom tags
+    renderMapCountyTags();
+}
+
+const countyCenters = {
+    '台北市': [25.0330, 121.5654],
+    '新北市': [25.0143, 121.4639],
+    '桃園市': [24.9936, 121.3010],
+    '台中市': [24.1477, 120.6736],
+    '台南市': [22.9908, 120.2060],
+    '臺北市': [25.0330, 121.5654],
+    '臺中市': [24.1477, 120.6736],
+    '臺南市': [22.9908, 120.2060],
+    '臺東縣': [22.7618, 121.1406],
+    '高雄市': [22.6273, 120.3014],
+    '基隆市': [25.1283, 121.7419],
+    '新竹市': [24.8138, 120.9674],
+    '新竹縣': [24.8388, 121.0116],
+    '苗栗縣': [24.5600, 120.8216],
+    '彰化縣': [24.0518, 120.5160],
+    '南投縣': [23.9060, 120.9176],
+    '雲林縣': [23.7092, 120.4313],
+    '嘉義市': [23.4801, 120.4491],
+    '嘉義縣': [23.4518, 120.2554],
+    '屏東縣': [22.4582, 120.5694],
+    '宜蘭縣': [24.7022, 121.7582],
+    '花蓮縣': [23.9961, 121.6082],
+    '台東縣': [22.7618, 121.1406],
+    '澎湖縣': [23.5711, 119.5794],
+    '金門縣': [24.4485, 118.3716],
+    '連江縣': [26.1556, 119.9298]
+};
+
+const countyZooms = {
+    '台北市': 12, '新北市': 11, '桃園市': 11, '台中市': 11, '台南市': 12, '高雄市': 11,
+    '基隆市': 13, '新竹市': 13, '新竹縣': 11, '苗栗縣': 11, '彰化縣': 11, '南投縣': 10,
+    '臺北市': 12, '臺中市': 11, '臺南市': 12, '臺東縣': 10,
+    '雲林縣': 11, '嘉義市': 13, '嘉義縣': 11, '屏東縣': 10, '宜蘭縣': 11, '花蓮縣': 10,
+    '台東縣': 10, '澎湖縣': 11, '金門縣': 12, '連江縣': 13
+};
+
+function renderMapCountyTags() {
+    const tagsContainer = document.getElementById("map-county-tags");
+    if (!tagsContainer) return;
+    tagsContainer.innerHTML = "";
+    
+    // Add "全部 All" tag
+    const allTag = document.createElement("button");
+    allTag.className = "filter-btn active";
+    allTag.style.padding = "4px 8px";
+    allTag.style.fontSize = "0.78rem";
+    allTag.style.borderRadius = "10px";
+    allTag.style.border = "1px solid var(--card-border)";
+    allTag.style.cursor = "pointer";
+    allTag.innerHTML = `<i class="fa-solid fa-earth-asia"></i> 全台灣`;
+    allTag.onclick = () => {
+        document.querySelectorAll("#map-county-tags .filter-btn").forEach(t => t.classList.remove("active"));
+        allTag.classList.add("active");
+        if (_leafletMap) _leafletMap.setView([23.6, 120.9], 7);
+    };
+    tagsContainer.appendChild(allTag);
+
+    // 🕊️ 二二八紀念公園快速篩選按鈕
+    const memorialTag = document.createElement("button");
+    memorialTag.className = "filter-btn";
+    memorialTag.style.padding = "4px 10px";
+    memorialTag.style.fontSize = "0.78rem";
+    memorialTag.style.borderRadius = "10px";
+    memorialTag.style.border = "1.5px solid #2C3E50";
+    memorialTag.style.background = "linear-gradient(135deg, rgba(44, 62, 80, 0.08), rgba(44, 62, 80, 0.18))";
+    memorialTag.style.fontWeight = "700";
+    memorialTag.style.cursor = "pointer";
+    memorialTag.innerHTML = `🕊️ 二二八紀念 (29)`;
+    memorialTag.onclick = () => {
+        document.querySelectorAll("#map-county-tags .filter-btn").forEach(t => t.classList.remove("active"));
+        memorialTag.classList.add("active");
+        if (_leafletMap) {
+            _leafletMap.setView([23.7, 120.9], 7);
+            // 立即定焦全台和平紀念軸線並彈出指標景點
+            const firstMem = locations.find(l => l.type === 'Memorial');
+            if (firstMem && window._leafletMarkers && window._leafletMarkers.get(firstMem.id)) {
+                window._leafletMarkers.get(firstMem.id).openPopup();
+            }
+        }
+    };
+    tagsContainer.appendChild(memorialTag);
+
+    // Get counts
+    const counts = {};
+    locations.forEach(loc => {
+        counts[loc.county] = (counts[loc.county] || 0) + 1;
+    });
+    
+    const activeCounties = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+    
+    activeCounties.forEach(county => {
+        const tag = document.createElement("button");
+        tag.className = "filter-btn";
+        tag.style.padding = "4px 8px";
+        tag.style.fontSize = "0.78rem";
+        tag.style.borderRadius = "10px";
+        tag.style.border = "1px solid var(--card-border)";
+        tag.style.cursor = "pointer";
+        tag.innerHTML = `<i class="fa-solid fa-location-dot" style="font-size: 0.65rem; color: var(--primary);"></i> ${county} (${counts[county]})`;
+        
+        tag.onclick = () => {
+            document.querySelectorAll("#map-county-tags .filter-btn").forEach(t => t.classList.remove("active"));
+            tag.classList.add("active");
+            
+            const norm = county.replace('臺', '台');
+            const coords = countyCenters[county] || countyCenters[norm];
+            const zoom = countyZooms[county] || countyZooms[norm] || 11;
+            if (_leafletMap && coords) {
+                _leafletMap.setView(coords, zoom);
+                // 立即開啟該縣市第一個景點的 Popup 給予即時互動回饋
+                const firstLoc = locations.find(l => (l.county === county || l.county === norm));
+                if (firstLoc && window._leafletMarkers && window._leafletMarkers.get(firstLoc.id)) {
+                    window._leafletMarkers.get(firstLoc.id).openPopup();
+                }
+            }
+        };
+        tagsContainer.appendChild(tag);
+    });
+}
+
+function mapPlayAudio(nameZH) {
+    playTaigiTTS(nameZH);
+}
+
+// ===========================================================
+// 9. 詞彙牆
+// ===========================================================
+function getCombinedVocab() {
+    // Base vocabulary
+    const baseVocab = vocabData.map(item => ({...item}));
+    // Map locations to vocabulary items
+    const locationVocab = locations.map(loc => ({
+        zh: loc.nameZH,
+        tw: loc.pinyin,
+        en: loc.nameEN,
+        emoji: loc.icon,
+        type: 'place',
+        county: loc.county
+    }));
+    return [...baseVocab, ...locationVocab];
+}
+
+function renderVocabWall() {
+    const container = document.getElementById("vocab-container");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const combined = getCombinedVocab();
+
+    combined.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "vocab-card";
+        card.setAttribute("data-type", item.type);
+        if (item.county) {
+            card.setAttribute("data-county", item.county);
+        }
+        card.onclick = () => playTaigiTTS(item.zh);
+
+        let countyBadge = "";
+        if (item.county) {
+            countyBadge = `<div class="vocab-county" style="font-size: 0.72rem; color: var(--text-light); font-weight: 700; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> ${item.county}
+            </div>`;
+        }
+
+        card.innerHTML = `
+            <span class="vocab-emoji">${item.emoji}</span>
+            <div class="vocab-zh">${item.zh}</div>
+            <div class="vocab-pinyin">${item.tw}</div>
+            <div class="vocab-en">${item.en}</div>
+            ${countyBadge}
+        `;
+        container.appendChild(card);
+    });
+}
+
+function renderCountyStats() {
+    const statsContent = document.getElementById("county-stats-content");
+    if (!statsContent) return;
+    statsContent.innerHTML = "";
+    
+    const counts = {};
+    locations.forEach(loc => {
+        counts[loc.county] = (counts[loc.county] || 0) + 1;
+    });
+    
+    // Sort counties by count descending
+    const sortedCounties = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+    
+    sortedCounties.forEach(county => {
+        const chip = document.createElement("span");
+        chip.className = "filter-btn";
+        chip.style.padding = "5px 12px";
+        chip.style.fontSize = "0.78rem";
+        chip.style.borderRadius = "50px";
+        chip.style.cursor = "pointer";
+        chip.style.display = "inline-flex";
+        chip.style.alignItems = "center";
+        chip.style.gap = "4px";
+        chip.style.border = "1.5px solid var(--card-border)";
+        chip.style.background = "var(--card-bg)";
+        chip.style.color = "var(--text)";
+        chip.style.boxShadow = "var(--shadow)";
+        chip.style.transition = "var(--transition)";
+        
+        // Check if this county is currently selected
+        const selectedCounty = document.getElementById("county-select").value;
+        if (selectedCounty === county) {
+            chip.style.background = "var(--primary)";
+            chip.style.color = "white";
+            chip.style.borderColor = "var(--primary)";
+            chip.style.boxShadow = "var(--shadow-active)";
+        }
+        
+        chip.onclick = (e) => {
+            e.stopPropagation();
+            document.getElementById("county-select").value = county;
+            filterByCounty(county);
+        };
+        
+        chip.innerHTML = `<i class="fa-solid fa-location-dot" style="font-size:0.7rem; color: ${selectedCounty === county ? 'white' : 'var(--primary)'}"></i> ${county} (${counts[county]})`;
+        statsContent.appendChild(chip);
+    });
+}
+
+function filterByCounty(county) {
+    // Automatically switch category filter to "地點 Places" or "全部 All"
+    const activeTabButton = document.querySelector(".vocab-filter .filter-btn.active");
+    const activeTab = activeTabButton ? activeTabButton.id : "btn-filter-all";
+    
+    if (activeTab !== "btn-filter-place" && activeTab !== "btn-filter-all") {
+        document.querySelectorAll(".vocab-filter .filter-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById("btn-filter-place").classList.add("active");
+    }
+    
+    if (county === 'all') {
+        const activeCategoryButton = document.querySelector(".vocab-filter .filter-btn.active");
+        const activeCategory = activeCategoryButton ? activeCategoryButton.id.replace("btn-filter-", "") : "all";
+        
+        if (activeCategory === "all") {
+            document.querySelectorAll(".vocab-card").forEach(c => c.style.display = "block");
+        } else {
+            document.querySelectorAll(".vocab-card").forEach(c => {
+                c.style.display = c.getAttribute("data-type") === "place" ? "block" : "none";
+            });
+        }
+    } else {
+        document.querySelectorAll(".vocab-card").forEach(c => {
+            c.style.display = (c.getAttribute("data-type") === "place" && c.getAttribute("data-county") === county) 
+                ? "block" : "none";
+        });
+    }
+    
+    // Update active chips styling in stats panel
+    renderCountyStats();
+}
+
+function downloadFile(content, fileName, contentType) {
+    const a = document.createElement("a");
+    const file = new Blob([content], {type: contentType});
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+function exportVocab(format) {
+    const combined = getCombinedVocab();
+    
+    if (format === 'json') {
+        const jsonStr = JSON.stringify(combined, null, 4);
+        downloadFile(jsonStr, 'taigi_vocabulary.json', 'application/json');
+    } else if (format === 'md') {
+        const baseTotal = vocabData.length;
+        const placeTotal = locations.length;
+        const total = combined.length;
+        
+        // Compute county counts
+        const countyCounts = {};
+        locations.forEach(loc => {
+            countyCounts[loc.county] = (countyCounts[loc.county] || 0) + 1;
+        });
+        const sortedCounties = Object.keys(countyCounts).sort((a, b) => countyCounts[b] - countyCounts[a]);
+        
+        const categoryMap = {
+            'land': '陸地 Land',
+            'water': '水域 Water',
+            'nature': '自然 Nature',
+            'museum': '博物館 Museum',
+            'culture': '文化 Culture',
+            'place': '地點 Places'
+        };
+
+        let mdContent = `# 🌏 景點與自然文化台語詞彙表 (Vocabulary List)
+
+`;
+        mdContent += `本詞彙表由「景點博物館四界行」Web App 匯出，收錄了台灣知名景點、博物館、自然地質與文化詞彙。
+
+`;
+        mdContent += `## 📊 詞彙統計 (Statistics)
+`;
+        mdContent += `- **總詞彙量 (Total Words):** ${total}
+`;
+        mdContent += `- **自然文化詞彙 (Base Vocabulary):** ${baseTotal}
+`;
+        mdContent += `- **台灣景點與博物館 (Places):** ${placeTotal}
+
+`;
+        
+        mdContent += `### 📍 縣市景點分佈統計 (County Distribution)
+`;
+        sortedCounties.forEach(county => {
+            mdContent += `- **${county}:** ${countyCounts[county]} 個景點
+`;
+        });
+        mdContent += `
+---
+
+`;
+        
+        mdContent += `## 📖 詞彙對照表 (Vocabulary Wall)
+
+`;
+        mdContent += `| 圖示 (Emoji) | 中文 (Chinese) | 台羅拼音 (Lô-má-jī) | 英文 (English) | 分類 (Category) | 縣市 (County) |
+`;
+        mdContent += `| :---: | :---: | :--- | :--- | :--- | :--- |
+`;
+        
+        combined.forEach(item => {
+            const catStr = categoryMap[item.type] || item.type;
+            const countyStr = item.county ? item.county : '-';
+            mdContent += `| ${item.emoji} | **${item.zh}** | \`${item.tw}\` | ${item.en} | ${catStr} | ${countyStr} |
+`;
+        });
+        
+        mdContent += `
+
+*匯出時間：${new Date().toLocaleString()}*`;
+        
+        downloadFile(mdContent, 'taigi_vocabulary.md', 'text/markdown;charset=utf-8');
+    }
+}
+
+function filterVocab(type) {
+    document.querySelectorAll(".vocab-filter .filter-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById(`btn-filter-${type}`).classList.add("active");
+    
+    // Reset county select
+    document.getElementById("county-select").value = "all";
+    
+    // Show/hide county stats panel and dropdown
+    const statsContainer = document.getElementById("county-stats-container");
+    const countySelect = document.getElementById("county-select");
+    
+    if (type === 'all' || type === 'place') {
+        statsContainer.style.display = "block";
+        countySelect.style.display = "block";
+        renderCountyStats();
+    } else {
+        statsContainer.style.display = "none";
+        countySelect.style.display = "none";
+    }
+    
+    // Standard card show/hide logic
+    if (type === 'all') {
+        document.querySelectorAll(".vocab-card").forEach(c => c.style.display = "block");
+    } else {
+        document.querySelectorAll(".vocab-card").forEach(c => {
+            c.style.display = c.getAttribute("data-type") === type ? "block" : "none";
+        });
+    }
+}
+
+// ===========================================================
+// 10. 台語聽力挑戰 (Quiz Engine)
+// ===========================================================
+let quizIndex = 0, quizScore = 0, quizTime = 15, quizTimer;
+let currentQuizLoc = null, isAnswered = false;
+const QUIZ_TOTAL = 8;
+const QUIZ_TIME_LIMIT = 15;
+
+function startQuiz() {
+    document.getElementById("quiz-welcome").style.display = "none";
+    document.getElementById("quiz-result").style.display = "none";
+    document.getElementById("quiz-game").style.display = "block";
+    quizIndex = 0;
+    quizScore = 0;
+    document.getElementById("quiz-score").innerHTML = `<i class="fa-solid fa-star"></i> 分數: 0`;
+    loadQuizQuestion();
+}
+
+function loadQuizQuestion() {
+    isAnswered = false;
+    quizIndex++;
+    document.getElementById("quiz-progress").innerHTML = `<i class="fa-solid fa-circle-question"></i> 第 ${quizIndex} / ${QUIZ_TOTAL} 題`;
+    document.getElementById("quiz-feedback").textContent = "";
+    document.getElementById("quiz-feedback").style.color = "inherit";
+
+    const shuffled = [...locations].sort(() => 0.5 - Math.random());
+    currentQuizLoc = shuffled[0];
+    const options = shuffled.slice(0, 4).sort(() => 0.5 - Math.random());
+
+    const optContainer = document.getElementById("quiz-options");
+    optContainer.innerHTML = "";
+    options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `${opt.icon} ${opt.nameEN} <small style="opacity:0.7;">(${opt.nameZH})</small>`;
+        btn.onclick = () => submitQuizAnswer(opt, btn);
+        optContainer.appendChild(btn);
+    });
+
+    setTimeout(() => playQuizAudio(), 600);
+
+    // Timer
+    quizTime = QUIZ_TIME_LIMIT;
+    document.getElementById("quiz-timer").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> 剩餘: ${quizTime}s`;
+    const bar = document.getElementById("quiz-timer-bar");
+    bar.style.transition = "none";
+    bar.style.width = "100%";
+    setTimeout(() => {
+        bar.style.transition = `width ${QUIZ_TIME_LIMIT}s linear`;
+        bar.style.width = "0%";
+    }, 60);
+
+    clearInterval(quizTimer);
+    quizTimer = setInterval(() => {
+        quizTime--;
+        document.getElementById("quiz-timer").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> 剩餘: ${quizTime}s`;
+        if (quizTime <= 0) handleTimeout();
+    }, 1000);
+}
+
+function playQuizAudio() {
+    if (currentQuizLoc) playTaigiTTS(currentQuizLoc.nameZH);
+}
+
+function submitQuizAnswer(selectedOpt, btn) {
+    if (isAnswered) return;
+    isAnswered = true;
+    clearInterval(quizTimer);
+    document.querySelectorAll(".option-btn").forEach(b => b.disabled = true);
+
+    const feedback = document.getElementById("quiz-feedback");
+    if (selectedOpt.id === currentQuizLoc.id) {
+        quizScore++;
+        btn.classList.add("correct");
+        feedback.textContent = `👍 答著矣！ (Tio̍h-ah!) — ${currentQuizLoc.pinyin}`;
+        feedback.style.color = "#00B894";
+    } else {
+        btn.classList.add("wrong");
+        feedback.textContent = `❌ 毋著喔！ (M̄-tio̍h!) 正確答案: ${currentQuizLoc.nameZH} (${currentQuizLoc.pinyin})`;
+        feedback.style.color = "#FF7675";
+        document.querySelectorAll(".option-btn").forEach(b => {
+            if (b.textContent.includes(currentQuizLoc.nameZH)) b.classList.add("correct");
+        });
+    }
+    document.getElementById("quiz-score").innerHTML = `<i class="fa-solid fa-star"></i> 分數: ${quizScore}`;
+    setTimeout(nextQuestion, 1800);
+}
+
+function handleTimeout() {
+    if (isAnswered) return;
+    isAnswered = true;
+    clearInterval(quizTimer);
+    document.querySelectorAll(".option-btn").forEach(b => {
+        b.disabled = true;
+        if (b.textContent.includes(currentQuizLoc.nameZH)) b.classList.add("correct");
+    });
+    const feedback = document.getElementById("quiz-feedback");
+    feedback.textContent = `⏰ 時間到！ 正確答案: ${currentQuizLoc.nameZH} (${currentQuizLoc.pinyin})`;
+    feedback.style.color = "#FF7675";
+    setTimeout(nextQuestion, 1800);
+}
+
+function nextQuestion() {
+    if (quizIndex < QUIZ_TOTAL) loadQuizQuestion();
+    else showQuizResult();
+}
+
+function showQuizResult() {
+    document.getElementById("quiz-game").style.display = "none";
+    document.getElementById("quiz-result").style.display = "block";
+    const passed = quizScore >= 6;
+    document.getElementById("quiz-final-score").innerHTML = passed
+        ? `🎉 你答對了 ${quizScore} / ${QUIZ_TOTAL} 題！太厲害了！<br><small style="color: var(--primary);">台語景點達人認證通過！ 👏</small>`
+        : `你答對了 ${quizScore} / ${QUIZ_TOTAL} 題。<br><small style="color: var(--text-light);">再多練習幾次，你一定可以做到的！ 💪</small>`;
+}
+
+function resetQuiz() {
+    document.getElementById("quiz-result").style.display = "none";
+    document.getElementById("quiz-welcome").style.display = "block";
+}
+
+
+    </script>
+</body>
+</html>
