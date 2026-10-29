@@ -427,12 +427,13 @@ footer {
 
     <!-- ===== Footer ===== -->
     <footer>
-        <p>© 2026 景點博物館四界行 — 台灣景點台語互動教學網頁</p>
-        <p style="margin-top: 4px;">@史秀里冊房 Tō͘ Sìn-liông 製作</p>
-        <p style="margin-top: 4px; font-size: 0.72rem;">
-            語音引擎：中華民國教育部《臺灣閩南語常用詞辭典》真人發音（線上）/ Web Speech API 備援（離線）<br>
-            音訊來源感謝 <a href="https://github.com/ChhoeTaigi/KipSutianDataMirror" target="_blank" style="color: var(--primary);">ChhoeTaigi KipSutianDataMirror</a> 社群鏡像
+        <p>© 2026 景點博物館四界行 — 台灣景點台語互動教學網頁. 全台博物館與二二八紀念碑版.</p>
+        <p style="margin-top: 4px; font-weight: 700;">@史秀里冊房 Tō͘ Sìn-liông 製作 2026 · <a href="https://github.com/SinLiongToo/Taiwanese-Scenic-Museum-Adventure" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: underline;">GitHub 原始碼庫</a></p>
+        <p style="margin-top: 4px; font-size: 0.75rem;">
+            本系統採用中華民國教育部《臺灣台語常用詞辭典》官方真人發音音訊與 Web Audio API 無縫連音變調引擎（Web Speech API 擬真備援技術）作為語音引擎.<br>
+            音訊來源感謝 <a href="https://github.com/ChhoeTaigi/KipSutianDataMirror" target="_blank" style="color: var(--primary); text-decoration: underline;">ChhoeTaigi KipSutianDataMirror</a> 社群鏡像 (版本: 20261019-0109)
         </p>
+        <p style="font-size: 0.72rem; margin-top: 6px; color: var(--text-light); opacity: 0.85;"><i class="fa-solid fa-clock-rotate-left"></i> 最後更新日期 (Last Updated): 2026-10-30</p>
     </footer>
 
     <script>
@@ -1145,17 +1146,80 @@ const wordSyllableMap = {
     '真相': ['tsin1', 'siong3'],
 };
 
-// === 語音引擎狀態 ===
-let speechRate = 0.9;
-let activeAudio = null;
-let queueCancelToken = 0;
+// ==========================================
+// 3.0 教育部台語音訊 CDN 與 Web Audio API 引擎狀態
+// 遵循 taiwanese-moe-audio 規範與版本同步標準
+// ==========================================
+const MOE_AUDIO_CDN_VERSION = "20261019-0109";
+const MOE_AUDIO_CDN_BASE = `https://chhoetaigi.github.io/KipSutianDataMirror/public/${MOE_AUDIO_CDN_VERSION}/imtong/sutiau/`;
+const CDN_BASE = MOE_AUDIO_CDN_BASE; // 相容別名
 
-const CDN_BASE = "https://chhoetaigi.github.io/KipSutianDataMirror/public/20260503-2330/imtong/sutiau";
+let speechRate = 0.9;
+let audioCtx = null;
+const audioBufferCache = new Map();
+let currentQueueToken = 0;
+let activeSourceNodes = [];
+
+function getAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
+
+// 自動靜音裁切：移除教育部辭典 MP3 錄音頭尾空白，消除字音串接時 100-300ms 突兀停頓
+function trimAudioBuffer(ctx, buffer, threshold = 0.015) {
+    const channelData = buffer.getChannelData(0);
+    const len = channelData.length;
+    let start = 0;
+    let end = len - 1;
+
+    while (start < len && Math.abs(channelData[start]) < threshold) start++;
+    while (end > start && Math.abs(channelData[end]) < threshold) end--;
+
+    // 保留 ~15ms 安全餘裕防爆音
+    const margin = Math.floor(buffer.sampleRate * 0.015);
+    start = Math.max(0, start - margin);
+    end = Math.min(len, end + margin);
+
+    const trimmedLength = end - start;
+    if (trimmedLength <= 0) return buffer;
+
+    const trimmed = ctx.createBuffer(buffer.numberOfChannels, trimmedLength, buffer.sampleRate);
+    for (let c = 0; c < buffer.numberOfChannels; c++) {
+        trimmed.copyToChannel(buffer.getChannelData(c).subarray(start, end), c);
+    }
+    return trimmed;
+}
+
+// 下載並解碼音訊，搭配記憶體 AudioBuffer 緩存
+async function fetchAndDecodeAudio(id) {
+    const cleanId = String(id).includes('(') ? id : `${id}(1)`;
+    if (audioBufferCache.has(cleanId)) return audioBufferCache.get(cleanId);
+
+    const url = `${MOE_AUDIO_CDN_BASE}${cleanId}.mp3`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${cleanId}`);
+    const arrayBuffer = await res.arrayBuffer();
+    const ctx = getAudioContext();
+    const decoded = await ctx.decodeAudioData(arrayBuffer);
+    const trimmed = trimAudioBuffer(ctx, decoded);
+    audioBufferCache.set(cleanId, trimmed);
+    return trimmed;
+}
 
 function cancelAudio() {
-    queueCancelToken++;
-    if (activeAudio) { activeAudio.pause(); activeAudio.currentTime = 0; activeAudio = null; }
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    currentQueueToken++;
+    activeSourceNodes.forEach(node => {
+        try { node.stop(); } catch(e) {}
+    });
+    activeSourceNodes = [];
+    if ('speechSynthesis' in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) {
+        window.speechSynthesis.cancel();
+    }
 }
 
 function updateBadge(mode) {
@@ -1390,28 +1454,68 @@ function computeSandhiAudioSequence(syllables, enableSandhi = true) {
     return audioIds;
 }
 
-// 音節序列播放器（逐音節串接，自然形成詞語發音）
-function playAudioSequence(audioIds) {
-    const token = ++queueCancelToken;
-    if (activeAudio) { activeAudio.pause(); activeAudio = null; }
-    let idx = 0;
+// ===========================================================
+// Web Audio API 無縫連音播放器（支援 0.5x - 2.5x 變速、消除音節間隙）
+// ===========================================================
+async function playAudioQueue(audioIds, fallbackText, speed = 1.0) {
+    currentQueueToken++;
+    const token = currentQueueToken;
 
-    function playNext() {
-        if (token !== queueCancelToken) return;
-        if (idx >= audioIds.length) return;
-        const id = audioIds[idx];
-        if (!id) { idx++; playNext(); return; }
-        const audio = new Audio(`${CDN_BASE}/${id}.mp3`);
-        activeAudio = audio;
-        audio.playbackRate = speechRate;
-        audio.onended = () => { idx++; playNext(); };
-        audio.onerror  = () => { idx++; playNext(); };
-        audio.play().catch(() => { idx++; playNext(); });
+    // 立即中斷先前所有發聲節點
+    activeSourceNodes.forEach(node => {
+        try { node.stop(); } catch(e) {}
+    });
+    activeSourceNodes = [];
+    if ('speechSynthesis' in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) {
+        window.speechSynthesis.cancel();
     }
-    playNext();
+
+    const cleanIds = (audioIds || []).filter(Boolean);
+    if (cleanIds.length === 0) {
+        playOfflineVoiceFallback(fallbackText);
+        return;
+    }
+
+    try {
+        const ctx = getAudioContext();
+        // 平行載入所有音節緩存（具備個別容錯回退）
+        const bufferResults = await Promise.all(cleanIds.map(async id => {
+            try {
+                return await fetchAndDecodeAudio(id);
+            } catch(e) {
+                console.warn(`[WebAudio] Fetch failed for ID ${id}:`, e);
+                return null;
+            }
+        }));
+        if (token !== currentQueueToken) return;
+
+        const buffers = bufferResults.filter(Boolean);
+        if (buffers.length === 0) {
+            playOfflineVoiceFallback(fallbackText);
+            return;
+        }
+
+        updateBadge("online");
+        let startTime = ctx.currentTime + 0.05;
+        buffers.forEach((buf) => {
+            const source = ctx.createBufferSource();
+            source.buffer = buf;
+            source.playbackRate.value = speed;
+            source.connect(ctx.destination);
+            source.start(startTime);
+            activeSourceNodes.push(source);
+            // 隨播放速度無縫推移時間軸，實現零延遲發音
+            startTime += (buf.duration / speed);
+        });
+    } catch (err) {
+        console.warn('Web Audio playback failed, routing to speech synthesis fallback:', err);
+        if (token === currentQueueToken) {
+            playOfflineVoiceFallback(fallbackText);
+        }
+    }
 }
 
-// 主要 TTS 函式：音節序列（連音變調） ➔ 終極備援 Web Speech API
+// 主要 TTS 函式：音節序列（連音變調） ➔ Web Audio API 無縫播放 ➔ 備援 Web Speech API
 function playTaigiTTS(text) {
     cancelAudio();
     const cleanText = text.replace(/[【】()（）]/g, '').trim();
@@ -1422,8 +1526,7 @@ function playTaigiTTS(text) {
         const audioIds = computeSandhiAudioSequence(syllableKeys, isToneSandhiEnabled);
         const hasAny = audioIds.some(id => id !== null);
         if (hasAny) {
-            updateBadge("online");
-            playAudioSequence(audioIds);
+            playAudioQueue(audioIds, cleanText, speechRate);
             return;
         }
     }
@@ -1431,16 +1534,40 @@ function playTaigiTTS(text) {
     playOfflineVoiceFallback(cleanText);
 }
 
+// 常用台語諧音表（增進離線/無台語音色時之發音擬真度）
+const twHomophones = {
+    // 景點與文教
+    "故宮": "故宮", "科博館": "科博館", "海生館": "海生館", "美術館": "美術館",
+    "博物館": "博悟館", "紀念碑": "紀念碑", "公園": "公緣", "古蹟": "古借",
+    // 交通與情境
+    "車站": "車贊", "火車": "毀車", "捷運": "基溫", "輕軌": "欣軌",
+    // 人權和平
+    "和平": "河平", "人權": "靈恐", "紀念": "記練", "民主": "明祖",
+    "自由": "自遊", "真相": "真向"
+};
+
 function playOfflineVoiceFallback(text) {
     if (!('speechSynthesis' in window)) return;
     updateBadge("offline");
-    window.speechSynthesis.cancel();
+
+    // 遵循 web-speech-tts 安全佇列規則，僅在 speaking 或 pending 時取消
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+    }
+
+    let phoneticText = text || "";
+    const sortedKeys = Object.keys(twHomophones).sort((a, b) => b.length - a.length);
+    sortedKeys.forEach(key => {
+        phoneticText = phoneticText.replace(new RegExp(key, 'g'), twHomophones[key]);
+    });
+
     const voices = window.speechSynthesis.getVoices();
     let voice = voices.find(v => v.lang.includes("nan") || v.name.includes("Mei-Jia") || v.name.includes("Taiwanese"));
     const useNan = !!voice;
     if (!voice) voice = voices.find(v => v.lang.includes("zh-TW"));
     if (voice && useNan) updateBadge("online");
-    const utterance = new SpeechSynthesisUtterance(text);
+
+    const utterance = new SpeechSynthesisUtterance(useNan ? text : phoneticText);
     utterance.lang  = useNan ? "nan" : "zh-TW";
     utterance.rate  = speechRate;
     if (voice) utterance.voice = voice;

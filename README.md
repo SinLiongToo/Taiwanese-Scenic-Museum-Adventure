@@ -98,15 +98,18 @@
 
 ### 雙模台語語音引擎 (Dual-Mode TTS Engine)
 
-1. **教育部台語真人發音（線上主引擎）**
-   - 連線至 [ChhoeTaigi KipSutianDataMirror](https://github.com/ChhoeTaigi/KipSutianDataMirror) 社群開源語音鏡像伺服器
-   - 網址格式：`https://chhoetaigi.github.io/KipSutianDataMirror/.../sutiau/{id}.mp3`
-   - 透過 `syllableAudioMap`（逾 1,800 個台羅音節）+ `wordSyllableMap` 映射詞彙至音節序列
+1. **教育部台語真人發音（線上 Web Audio API 主引擎，遵循 `taiwanese-moe-audio` 規範）**
+   - **KipSutian 鏡像版本同步**：連線至 [ChhoeTaigi KipSutianDataMirror](https://github.com/ChhoeTaigi/KipSutianDataMirror)，鎖定最新 active 版本 `20261019-0109`，解決上游目錄清理導致 404 之問題。
+   - **Web Audio API 無縫連音 (Gapless Playback)**：消除傳統 HTML5 Audio 逐字播放時 100~300ms 突兀間隔，音節連續發聲宛如真人流利口語。
+   - **自動靜音裁切 (Auto Silence Trimming)**：演算法動態分析音訊波形，自動去除辭典 MP3 錄音首尾空白段落（保留 ~15ms 緩衝防爆音），實現字音緊湊流暢銜接。
+   - **記憶體解碼緩存 (AudioBuffer Cache)**：平行預先載入解碼並快取至記憶體，重複發音零延遲。
+   - **道地連音變調 (Tone Sandhi Engine)**：整合教育部標準變調規則（`1➔7`, `2➔1`, `3➔2`, `4(-h)➔2`, `4(-ptk)➔8`, `5➔7`, `7➔3`, `8(-h)➔3`, `8(-ptk)➔4`）與 4 字 2+2 複合詞分割。
+   - **變速播放**：支援 0.5x ~ 2.5x 多段速度平滑變速（維持原音高）。
 
-2. **Web Speech API 離線備援**
-   - 優先搜尋瀏覽器內建的台語語音（`nan` / `Mei-Jia` / `Taiwanese`）
-   - 若無台語語音，降級使用 `zh-TW` 繁中語音
-   - Header 即時顯示語音引擎狀態 Badge（🔊 實體台語 / 🔇 離線備援）
+2. **Web Speech API 擬真離線備援**
+   - 優先搜尋瀏覽器內建之台語原生音色（`nan` / `Mei-Jia` / `Taiwanese`）。
+   - 若僅有華語音色，自動啟動 `twHomophones` 諧音擬真字典，將詞彙替換為最貼近台語發音之漢字諧音。
+   - Header 即時顯示語音引擎狀態 Badge（🔊 實體台語 (連音變調) / 🔇 離線備援）。
 
 ### 地圖技術
 - **Leaflet.js 1.9.4** + OpenStreetMap 底圖
@@ -287,3 +290,23 @@ npx -y live-server ./
 #### 4. Leaflet 互動地圖與分類導航
 - 地圖為紀念景點新增深岩灰風格 (`#2C3E50`) 與和平鴿圖示 (`🕊️`)。
 - 地圖頂端控制列新增專屬按鈕 **`🕊️ 二二八紀念 (29)`**，一鍵快速全景瀏覽台灣 29 處和平紀念地標。
+
+---
+
+### 2026-10-30 — 教育部真人語音引擎重構（Web Audio API 無縫連音 + 靜音裁切 + KipSutian 20261019-0109 版本同步）
+
+依循 `taiwanese-moe-audio` 技能標準，全面檢查與升級語音播放架構：
+1. **解決上游版本清理 404 陷阱 (Critical Fix)**：
+   - 上游 `ChhoeTaigi/KipSutianDataMirror` 於辭典改版時會刪除過期版本目錄，原舊版 `20260503-2330` 均已 404 失效，導致先前靜音或提早進入語音合成備援。
+   - 全面升級至官方目前最新驗證版本 `20261019-0109`，100% 恢復真人語音流暢讀音。
+2. **Web Audio API 無縫連音播放器 (Gapless Audio Scheduler)**：
+   - 告別 HTML5 `new Audio().onended` 產生的 100~300ms 突兀停頓。
+   - 採用 `AudioContext` 零延遲時間軸排程，所有音節平行預載與解碼。
+3. **自動靜音裁切 (Auto Silence Trimming)**：
+   - 動態波形分析自動偵測並切除 MP3 開頭與結尾的空白錄音（保留 15ms 安全餘裕防爆音），音節拼接如真人講話般自然連貫。
+4. **記憶體解碼緩存 (AudioBuffer Cache)**：
+   - 建立 `audioBufferCache` 映射，已解碼之 AudioBuffer 留在記憶體內，再次點擊零延遲瞬播。
+5. **台語諧音 Web Speech API 離線備援**：
+   - 擴充 `twHomophones` 表，離線或無原生台語音色時將詞彙轉為最接近台語發音之漢字諧音，大幅提升自然度。
+6. **頁尾透明版本戳記 (Transparency Footer)**：
+   - 明確標示最後更新日期 `2026-10-30` 與 KipSutian 語音鏡像版本 `20261019-0109`，方便隨時核驗。
